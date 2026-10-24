@@ -71,7 +71,8 @@ if [ -n "$SESSION" ]; then
   #   launch: icount_shift=<S|none> realtime=<on|off> control=<N> msp=<M> machine=<name>
   # (sed reads the whole report: quitting early would SIGPIPE printf under pipefail once the report
   # is larger than a pipe's buffer, e.g. a CLI board's config_src/config_json lines)
-  LAUNCH=$(printf '%s\n' "$CHECK" | sed -n '/^manifest: /,$b;s/^launch: //p')
+  # (two -e expressions: BSD/macOS sed reads `$b;s/...` as one label name, GNU sed does not)
+  LAUNCH=$(printf '%s\n' "$CHECK" | sed -n -e '/^manifest: /,$b' -e 's/^launch: //p')
   launch() { local kv; for kv in $LAUNCH; do [ "${kv%%=*}" = "$1" ] && printf '%s' "${kv#*=}"; done; return 0; }
   SHIFT=$(launch icount_shift); CTL_PORT=$(launch control); UART_PORT=$(launch msp)
   MACHINE=$(launch machine)     # the bench board's QEMU machine; a report without it: nexus-xr

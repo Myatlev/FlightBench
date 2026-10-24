@@ -33,6 +33,7 @@ WIN = sys.platform == "win32"
 EXPECT = {  # docs/contributing.md "Gates"; the flight models changed 2026-10-24: Linux to re-baseline on the homelab
     "linux": {},
     "win32": {"rs7": "adcc355a6808", "trainer": "18c7adf95de1"},
+    "darwin": {"rs7": "530d7de34c99", "trainer": "523feee9abe7"},   # Apple silicon (M-series), 2026-10-24
 }
 ALL = ["host", "equiv", "rs7", "rs7-osd", "trainer", "trainer-osd"]
 
@@ -54,7 +55,7 @@ class Gates:
         self.ctl, self.msp, self.mon, self.motion, self.pilot = range(a.ports, a.ports + 5)
         self.out = a.out or tempfile.mkdtemp(prefix="gates.")
         os.makedirs(self.out, exist_ok=True)
-        self.expect = dict(EXPECT.get(sys.platform if WIN else "linux", {}))
+        self.expect = dict(EXPECT.get(sys.platform if sys.platform in EXPECT else "linux", {}))
         for e in a.expect or []:
             k, v = e.split("=", 1)
             self.expect[k] = v

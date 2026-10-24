@@ -18,16 +18,18 @@ Automated agents work by the same rules.
 | `docs/architecture.md`, `docs/ui.md`, `docs/decisions.md` | design and the reasons behind it |
 
 ## Gates: what must hold before a merge
-| bench | Linux | Windows |
-|---|---|---|
-| RS7 liftoff (`sessions/rs7.json`) | to re-baseline (the models changed 2026-10-24) | `adcc355a6808` |
-| trainer plane-launch (preset + sensors) | to re-baseline | `18c7adf95de1` |
-| trainer-osd | to re-baseline | — |
-| rs7-osd | to re-baseline | — |
+| bench | Linux | Windows | macOS (Apple silicon) |
+|---|---|---|---|
+| RS7 liftoff (`sessions/rs7.json`) | to re-baseline (the models changed 2026-10-24) | `adcc355a6808` | `530d7de34c99` |
+| trainer plane-launch (preset + sensors) | to re-baseline | `18c7adf95de1` | `523feee9abe7` |
+| trainer-osd | to re-baseline | — | — (`5afe161f2690` observed) |
+| rs7-osd | to re-baseline | — | — (`0d4cebf80384` observed) |
 
 The flight models were rewritten on 2026-10-24 (`docs/fdm.md`); every flight hash moved. The Windows baselines above
 are from the rewrite's own gates run (`gates.py --new-baseline`); the Linux ones are taken on the homelab the next
-time the core is built there and go into this table and `gates.py`.
+time the core is built there and go into this table and `gates.py`. The macOS column is from the first macOS build
+(2026-10-24, arm64 core on an M-series Mac; `equiv` 251/251 there, all host suites pass). The three platforms give
+three different hashes for the same bench (`docs/status.md`, cross-platform determinism): each is compared with its own.
 
 The hashes are FDM-log hashes (md5, 12 hex digits) of a fixed flight plan; a guest-invisible change must not move
 them, a change that moves one must say why and record the new baseline in its evidence README. One command runs

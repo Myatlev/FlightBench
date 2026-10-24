@@ -12,7 +12,7 @@ set -euo pipefail
 IN=${1:?config}; OUT=${2:?out}; shift 2
 { printf '## Rotorflight Custom Defaults\n'; tr -d '\r' < "$IN"
   for P in "$@"; do tr -d '\r' < "$P" | grep -v -E '^[[:space:]]*(#|$)'; done; } > "$OUT"
-SZ=$(stat -c %s "$OUT")
+SZ=$(wc -c < "$OUT" | tr -d ' ')   # not `stat -c`: GNU only, BSD/macOS stat differs
 MAX=$((0x08004000 - 0x08002808))
 [ "$SZ" -lt "$MAX" ] || { echo "defaults too big: $SZ >= $MAX" >&2; exit 1; }
 echo "$OUT: $SZ bytes (max $MAX)"

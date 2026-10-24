@@ -47,7 +47,8 @@ public partial class CliLine : LineEdit
             case Key.Up when !mods: Show(History.Up(Text)); AcceptEvent(); break;
             case Key.Down when !mods: Show(History.Down()); AcceptEvent(); break;
             case Key.Escape when !mods && History.Browsing: Show(History.Cancel()); AcceptEvent(); break;
-            case Key.L when k.IsCommandOrControlPressed() && !k.AltPressed && !k.ShiftPressed: ClearLog?.Invoke(); AcceptEvent(); break;
+            // Ctrl+L on every platform (the hint says so); on macOS IsCommandOrControlPressed() is Cmd, accepted too
+            case Key.L when (k.CtrlPressed || k.IsCommandOrControlPressed()) && !k.AltPressed && !k.ShiftPressed: ClearLog?.Invoke(); AcceptEvent(); break;
         }
     }
 }
