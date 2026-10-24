@@ -41,8 +41,33 @@ public static class CoreLocator
     private static string ExeDir => Path.GetDirectoryName(OS.GetExecutablePath()) ?? "";
     private static bool HasData(string d) => Directory.Exists(Path.Combine(d, "boards")) && Directory.Exists(Path.Combine(d, "models"));
 
-    /// `<exe dir>/data/core/qemu-system-arm(.exe)` (what app/tools/export.ps1 bundles).
-    public static string BundledPath => Path.Combine(ExeDir, "data", "core", ExeName);
+    /// Where an exported build carries the core: `<exe dir>/data/core/qemu-system-arm(.exe)` (Windows / Linux,
+    /// app/tools/export.ps1), or `Contents/Helpers/qemu-system-arm` next to `Contents/MacOS/<exe>` in FlightBench.app
+    /// (macOS, app/tools/export.sh: a signed bundle keeps executables out of Resources/). The first that exists,
+    /// else the first candidate (for messages).
+    public static string BundledPath
+    {
+        get
+        {
+            var c = BundledCoreCandidates();
+            return c.FirstOrDefault(File.Exists) ?? c[0];
+        }
+    }
+    private static string[] BundledCoreCandidates()
+    {
+        var list = new List<string> { Path.Combine(ExeDir, "data", "core", ExeName) };
+        if (OperatingSystem.IsMacOS()) list.Add(Path.Combine(ExeDir, "..", "Helpers", ExeName));
+        return list.ToArray();
+    }
+
+    /// Where an exported build carries the data root (boards/, models/, presets/, firmware/): `<exe dir>/data`, or
+    /// `Contents/Resources/data` in FlightBench.app. Null when the build has none.
+    public static string? BundledDataDir()
+    {
+        var c = new List<string> { Path.Combine(ExeDir, "data") };
+        if (OperatingSystem.IsMacOS()) c.Add(Path.Combine(ExeDir, "..", "Resources", "data"));
+        return c.FirstOrDefault(HasData) is { } d ? Path.GetFullPath(d) : null;
+    }
 
     /// The core to start: the bundled one (exported build), else Settings → Paths → core (CorePath), else
     /// FB_CORE_EXE. Null when none exists; `source` says which one was taken or why none was.
@@ -71,11 +96,7 @@ public static class CoreLocator
     {
         get
         {
-            if (!OS.HasFeature("editor"))
-            {
-                var d = Path.Combine(ExeDir, "data");
-                if (HasData(d)) return Path.GetFullPath(d);
-            }
+            if (!OS.HasFeature("editor") && BundledDataDir() is { } d) return d;
             return AppState.RepoRoot;
         }
     }

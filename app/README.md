@@ -209,7 +209,7 @@ following `docs/protocol.md` → "Launching the core".
   false for a silent listener and true for one that greets with `log` + `hello` (`corelaunch` also probes the
   real core: true).
 
-## Export (standalone Windows build)
+## Export (standalone Windows build; macOS below)
 Presets in `app/export_presets.cfg`: **Windows Desktop** (release: `dist/FlightBench/`, PCK embedded in the exe,
 no .NET debug symbols, no console wrapper) and **Windows Desktop (debug)** (`dist/FlightBench-debug/`, .NET
 debug symbols, `FlightBench.console.exe` wrapper). `include_filter` packs the non-resource files the app reads
@@ -235,6 +235,31 @@ carries a `.gdignore`, so Godot neither imports nor packs it.
 ```
 # Godot: -Godot <console exe>, else $env:GODOT, else `godot` on PATH (the 4.7.2 .NET console exe)
 ```
+### macOS: `app/tools/export.sh`
+Preset **macOS** in `export_presets.cfg` (universal binary — the 4.7.2 template ships only `godot_macos_release.universal`,
+so an `arm64` preset is refused; `rendering/textures/vram_compression/import_etc2_astc=true` in `project.godot` is required
+for it). The script then thins the app to arm64 (`lipo -thin` on the Godot binary, the x86_64 .NET runtime removed) to match
+the arm64 core; `--universal` keeps both halves. `app/tools/export.sh` is the counterpart of `export.ps1`: Godot export → `dist/FlightBench-macos/FlightBench.app`,
+the same `data/` rules into `Contents/Resources/data/`, the core from `dist/core` (`core/qemu/tools/package-mac.sh`) into
+`Contents/Helpers/qemu-system-arm` + `Contents/Frameworks/*.dylib`, `LICENSE` + `README.txt` (`tools/dist-README-macos.txt`)
+next to the bundle; `--presets`, `--data-only`, `--zip`, `--core-dir`, `--godot` as in the PowerShell script. `CoreLocator`
+and `AppSettings.DefaultRepoRoot` know both layouts (`<exe dir>/data` and the bundle's). Godot's .NET export runs
+`/usr/local/share/dotnet/dotnet` when it exists (`GodotTools.DotNetFinder`), so the .NET 8 SDK must be installed there
+(`brew install --cask dotnet-sdk@8`), a Homebrew `dotnet@8` on `PATH` is not enough.
+
+Signing is inside-out and explicit (Godot's own signing is off in the preset, because files are added after the export):
+every Mach-O in the bundle (the .NET runtime's dylibs sit in `Contents/Resources/data_*`, where `codesign --deep` would
+not find them), the core with `core/qemu/tools/qemu-entitlements.plist` (JIT: QEMU's TCG), the app with
+`tools/macos-entitlements.plist` (JIT: CoreCLR). Without `--sign` the bundle is ad hoc and **without** the hardened
+runtime (a hardened ad-hoc core cannot load its own dylibs: library validation wants a Team ID); it runs on the
+building Mac only. `--sign "Developer ID Application: Name (TEAM)"` signs with the hardened runtime and a timestamp;
+`--notarize <profile>` (a `xcrun notarytool store-credentials` keychain profile) submits, waits, staples and asks
+Gatekeeper (`spctl --assess`). Check: `FB_PRESET=rs7-first-flight FB_LIVE_CHECK=1 dist/FlightBench-macos/FlightBench.app/Contents/MacOS/FlightBench`.
+Result (2026-10-24, M-series Mac): arm64 app + core 195 MB, zip 65 MB (universal: 355 MB / 129 MB); live-check 2 PASS on the
+signed, hardened bundle; notarytool "Accepted" in about two minutes, `spctl --assess` on a quarantined copy of the zip:
+"source=Notarized Developer ID". Self-tests run the same way (`FB_SELFTEST=all FB_CORE=127.0.0.1:31250 <Godot_mono.app>/Contents/MacOS/Godot --path app --headless`
+with `python3 tools/fake_core.py`): 46/46.
+
 Result (2026-09-26): `FlightBench.exe` (~105 MB, engine + PCK) + `data_FlightBench_windows_x86_64/` (the .NET
 runtime + `FlightBench.dll`, 186 files) + `data/` (8 files, ~24 KB) = ~182 MB; ship the folder as a whole. The
 exe runs the same `FB_*` dev knobs (`FB_BENCH=smoke FB_CORE=127.0.0.1:31250 dist/FlightBench/FlightBench.exe

@@ -137,8 +137,8 @@ public sealed class AppSettings
     }
 
     /// Editor / project run: the app lives in <repo>/app, so the parent when it has boards/. Exported build
-    /// (res:// is inside the .pck and does not globalize): <exe dir>/data when it has both boards/ and models/
-    /// (copied there by app/tools/export.ps1), else the nearest folder above the exe that has both —
+    /// (res:// is inside the .pck and does not globalize): <exe dir>/data (or Contents/Resources/data in FlightBench.app)
+    /// when it has both boards/ and models/ (copied there by app/tools/export.ps1 / export.sh), else the nearest folder above the exe that has both —
     /// <repo>/dist/FlightBench/FlightBench.exe → <repo>; none → the exe's folder (the user sets Settings → Paths).
     public static string DefaultRepoRoot()
     {
@@ -150,8 +150,7 @@ public sealed class AppSettings
         }
         var exeDir = Path.GetDirectoryName(OS.GetExecutablePath()) ?? "";
         static bool HasData(string d) => Directory.Exists(Path.Combine(d, "boards")) && Directory.Exists(Path.Combine(d, "models"));
-        var bundled = Path.Combine(exeDir, "data");
-        if (HasData(bundled)) return bundled;
+        if (CoreLocator.BundledDataDir() is { } bundled) return bundled;   // <exe dir>/data, or Contents/Resources/data on macOS
         for (var d = exeDir; !string.IsNullOrEmpty(d); d = Path.GetDirectoryName(d))
             if (HasData(d)) return d;
         return exeDir;

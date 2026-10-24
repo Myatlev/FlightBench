@@ -75,8 +75,13 @@ config NEXUS_XR
     select STM32L4X5_USART
 K
 # the F4 USART model (stm32f2xx_usart) came with the speedybee-f405-wing machine
-grep -A6 "config NEXUS_XR" "$Q/hw/arm/Kconfig" | grep -q "STM32F2XX_USART" ||
-  sed -i '/^config NEXUS_XR$/,/^$/s/^    select STM32L4X5_USART$/    select STM32L4X5_USART\n    select STM32F2XX_USART/' "$Q/hw/arm/Kconfig"
+# (awk + mv, not `sed -i`: GNU and BSD/macOS sed disagree on -i and on \n in a replacement)
+KC="$Q/hw/arm/Kconfig"
+grep -A6 "config NEXUS_XR" "$KC" | grep -q "STM32F2XX_USART" || {
+  awk '/^config NEXUS_XR$/ { inblk=1 } inblk && /^$/ { inblk=0 }
+       { print } inblk && $0 == "    select STM32L4X5_USART" { print "    select STM32F2XX_USART" }' "$KC" > "$KC.tmp"
+  mv "$KC.tmp" "$KC"
+}
 
 FILES="'nexus_xr.c'"
 for f in "$DEV"/src/*.c "$FDM"/src/*.c; do FILES="$FILES, 'fb-devices/$(basename "$f")'"; done

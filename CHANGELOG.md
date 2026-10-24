@@ -1,5 +1,18 @@
 # Changelog
 
+## v0.1.1 — macOS (unreleased: the date goes in with the tag)
+- **macOS (Apple silicon, macOS 26+)**: the core builds and packages on macOS (`core/qemu/build.sh`,
+  `core/qemu/tools/package-mac.sh`), the app exports as `FlightBench.app` with the core and data inside
+  (`app/tools/export.sh`; signed with a Developer ID, notarized and stapled; arm64 app and core). Same bench, same
+  two live-check PASS lines; measured on an M1 Pro with the realtime limit off: the trainer flies at 3.6× real time,
+  the RS7 at 2.3×. The gate suite runs on macOS with its own flight baselines (`docs/contributing.md`).
+- `FlightBench-macos-v0.1.1.zip` in the release next to the Windows zip; the Windows build is rebuilt from the same
+  commit (the app's data/core lookup and the CLI line changed for every platform).
+- Ctrl+L clears the CLI log on every platform (macOS also takes Cmd+L).
+- SIGTERM / SIGINT (a kill, Ctrl+C in a terminal) on macOS and Linux quit the app cleanly and stop the core, instead
+  of a SIGABRT crash report from CoreCLR's exit() racing Godot's shutdown.
+- `tools/md-dangling.py`: the pre-push check for dangling Markdown links, in the repo now.
+
 ## v0.1.0 — 2026-10-24, first release
 
 One bench ships: **RS7 · First flight** — the official RotorFlight 4.6.0 release hex for the RadioMaster

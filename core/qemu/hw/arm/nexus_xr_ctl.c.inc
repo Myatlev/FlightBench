@@ -4396,8 +4396,10 @@ static void ctl_watch_stat(NxCtl *ctl, int64_t *mtime, int64_t *size)
 {
     GStatBuf st;
     if (ctl->fw_path && !g_stat(ctl->fw_path, &st)) {
-#ifdef _WIN32
+#if defined(_WIN32)
         *mtime = (int64_t)st.st_mtime * 1000000000LL;   /* mingw: seconds only */
+#elif defined(__APPLE__)
+        *mtime = st.st_mtimespec.tv_sec * 1000000000LL + st.st_mtimespec.tv_nsec;   /* BSD name of st_mtim */
 #else
         *mtime = st.st_mtim.tv_sec * 1000000000LL + st.st_mtim.tv_nsec;
 #endif

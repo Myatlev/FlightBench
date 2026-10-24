@@ -7,7 +7,7 @@ config_version=5
 [application]
 
 config/name="FlightBench"
-config/version="0.1.0"
+config/version="0.1.1"
 config/description="A bench for flight-controller firmware developers: the real firmware in an emulated MCU, flown by an FDM."
 run/main_scene="res://scenes/MainMenu.tscn"
 config/features=PackedStringArray("4.7", "C#", "Forward Plus")
@@ -31,3 +31,4 @@ project/assembly_name="FlightBench"
 [rendering]
 
 renderer/rendering_method="forward_plus"
+textures/vram_compression/import_etc2_astc=true
