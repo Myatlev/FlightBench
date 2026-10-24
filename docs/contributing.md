@@ -17,6 +17,9 @@ Automated agents work by the same rules.
 | `docs/protocol.md` | the core ↔ client contract (launch, session-check report, messages, events) — authoritative |
 | `docs/architecture.md`, `docs/ui.md`, `docs/decisions.md` | design and the reasons behind it |
 
+Before a push to the public repo: `python3 tools/md-dangling.py` (no dangling Markdown links) and a grep of the tree
+for machine-specific paths and addresses.
+
 ## Gates: what must hold before a merge
 | bench | Linux | Windows | macOS (Apple silicon) |
 |---|---|---|---|

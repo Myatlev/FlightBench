@@ -5,7 +5,7 @@ Nexus-XR flies, running on an emulated one.
 
 ## 1. Get FlightBench
 
-Download `FlightBench-win64-v0.1.0.zip` from https://github.com/Myatlev/flightbench/releases and unzip it
+Download `FlightBench-win64-v0.1.1.zip` from https://github.com/Myatlev/flightbench/releases and unzip it
 anywhere. The archive holds one folder, `FlightBench/`: `FlightBench.exe`, a `data/` folder next to it (the
 bundled core and firmware), `README.txt` and `LICENSE`. Run `FlightBench.exe` — nothing else to install.
 
