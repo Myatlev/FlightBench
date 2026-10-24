@@ -9,7 +9,7 @@ Download `FlightBench-win64-v0.1.1.zip` from https://github.com/Myatlev/flightbe
 anywhere. The archive holds one folder, `FlightBench/`: `FlightBench.exe`, a `data/` folder next to it (the
 bundled core and firmware), `README.txt` and `LICENSE`. Run `FlightBench.exe` — nothing else to install.
 
-macOS (Apple silicon): `FlightBench-macos-v<version>.zip` holds `FlightBench.app`, `README.txt` and `LICENSE`; open the
+macOS (**Apple silicon only, macOS 26 or newer**; no Intel): `FlightBench-macos-v<version>.zip` holds `FlightBench.app`, `README.txt` and `LICENSE`; open the
 app (the core and the data travel inside the bundle). Everything below is the same; where it says `FlightBench.exe`,
 read `FlightBench.app`. The published builds are signed with a Developer ID and notarized, so Gatekeeper opens them like any
 downloaded app; a build you made yourself without `--sign` is refused on another Mac (right-click → Open, or

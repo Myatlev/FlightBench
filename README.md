@@ -21,7 +21,7 @@ CLI lines) is explicit, reproducible and yours to edit.
 
 ## Quickstart
 Windows, about 10 minutes: unzip the release, run `FlightBench.exe`, open **RS7 · First flight** from the
-Presets list. macOS (Apple silicon): unzip, open `FlightBench.app`, the same preset. Full walkthrough,
+Presets list. macOS (Apple silicon, macOS 26 or newer): unzip, open `FlightBench.app`, the same preset. Full walkthrough,
 including arming and flying: `docs/quickstart.md`.
 
 ## Supported (v0.1)
@@ -30,7 +30,11 @@ including arming and flying: `docs/quickstart.md`.
 | RadioMaster Nexus-XR (STM32F722) | RotorFlight 4.6.0, the official release hex | RS7 (Goosky RS7 Ultra, 700-class heli) | **v0.1** — preset "RS7 · First flight" |
 
 Planned: iNav on a fixed-wing bench, Betaflight on a quad, ArduPilot; an OSD preset (needs a firmware
-build with OSD compiled in); Linux desktop build. macOS (Apple silicon) builds from this tree, see below.
+build with OSD compiled in); Linux desktop build.
+
+**Platforms:** Windows x86_64 (10/11). macOS: **Apple silicon only, macOS 26 (Tahoe) or newer** — the core and its
+libraries are built on macOS 26 and carry that as their minimum; Intel Macs are not supported (the core is an arm64
+binary). Older macOS needs the core's libraries built with a lower deployment target — a planned step, not in this release.
 
 Exact evidence for every claim above: `docs/status.md`.
 
