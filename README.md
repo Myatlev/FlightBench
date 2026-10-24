@@ -123,6 +123,10 @@ licence that keeps the whole core distributable. Godot is MIT. The bundled firmw
 GPL-3.0 software, executed by the emulated MCU, never linked into FlightBench — see `firmware/FIRMWARE.md`
 for its source and checksum. Contributions are accepted under the same terms.
 
+## Support
+FlightBench is a tool I built because I wanted it; it is free and stays free. If it is useful to you and you
+feel like it, you can [buy me a propeller](https://ko-fi.com/myatlev) — something always breaks on the weekend.
+
 ## Credits
 - [RotorFlight](https://github.com/rotorflight/rotorflight-firmware) — the helicopter firmware flown by
   the RS7 bench.
