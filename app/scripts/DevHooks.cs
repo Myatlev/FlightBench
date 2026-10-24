@@ -59,9 +59,25 @@ public partial class DevHooks : Node
         GD.Print($"[app] core {(exe != null ? exe + " (" + src + ")" : "not found: " + src)}; data root {CoreLocator.DataRoot}");
         if (exe != null) CoreManifest.Ensure(exe, CoreLocator.DataRoot);
         System.AppDomain.CurrentDomain.ProcessExit += (_, _) => CoreProcess.StopAll(2000);
+        // SIGTERM / SIGINT (a `timeout`, a kill, Ctrl+C in the terminal) on macOS / Linux: CoreCLR's default handler calls
+        // exit() on its own thread while Godot's main loop still runs, and Godot's static destructors then abort on a
+        // dead mutex (a SIGABRT crash report instead of an exit). Cancel that and quit through the scene tree: the
+        // flight screen's _ExitTree stops the core, the app leaves cleanly.
+        if (!System.OperatingSystem.IsWindows())
+        {
+            foreach (var sig in new[] { System.Runtime.InteropServices.PosixSignal.SIGTERM, System.Runtime.InteropServices.PosixSignal.SIGINT })
+                _signals.Add(System.Runtime.InteropServices.PosixSignalRegistration.Create(sig, ctx =>
+                {
+                    ctx.Cancel = true;
+                    if (System.Threading.Interlocked.Exchange(ref _quitRequested, 1) != 0) return;   // a second signal: already on the way out
+                    Callable.From(() => { GD.Print($"[app] {ctx.Signal}: quitting"); GetTree().Quit(); }).CallDeferred();
+                }));
+        }
     }
 
     /// App exit: every core the app started is stopped (keep-running applies to closing a bench only).
+    private readonly System.Collections.Generic.List<System.IDisposable> _signals = new();
+    private int _quitRequested;
     public override void _ExitTree() => CoreProcess.StopAll();
 
     private void FeedFakeJoy(double delta)

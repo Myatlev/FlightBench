@@ -60,6 +60,8 @@ if [ -z "$DATA_ONLY" ]; then
   mkdir -p "$OUT"; rm -rf "$BUNDLE"
   "$GODOT" --headless --path "$APP" --export-release macOS "$BUNDLE" 2>&1 | grep -viE 'editor_(fonts|theme)|HotReloadAssemblyWatcher|godot_icall|NativeCalls|CSharpInstanceBridge|ScriptMethods|at: start \(scene/main/timer|Unable to start the timer|Case mismatch|open_internal|^\[ *[0-9]+% \]|\[ DONE \]|^\[0m$|^$' || true
   [ -x "$BUNDLE/Contents/MacOS/FlightBench" ] || { echo "export.sh: export produced no $BUNDLE/Contents/MacOS/FlightBench" >&2; exit 1; }
+  # Godot exits 0 even when its .NET publish failed (the bundle then has no data_FlightBench_macos_* and crashes at start)
+  ls -d "$RES"/data_FlightBench_macos_* >/dev/null 2>&1 || { echo "export.sh: no .NET publish output in the bundle (Resources/data_FlightBench_macos_*): the C# build failed — see the dotnet errors above / Godot's MSBuild log" >&2; exit 1; }
   # Godot's official macOS template is universal only (an `arm64` preset is refused: no godot_macos_release.arm64), so
   # the export is universal; the core is arm64, so by default the app is thinned to arm64 too: the Godot binary's
   # x86_64 slice and the x86_64 .NET runtime go (about a third of the bundle). --universal keeps them.
