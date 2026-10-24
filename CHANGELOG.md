@@ -1,6 +1,6 @@
 # Changelog
 
-## v0.1.1 — macOS (unreleased: the date goes in with the tag)
+## v0.1.1 — 2026-10-24, macOS
 - **macOS (Apple silicon, macOS 26+)**: the core builds and packages on macOS (`core/qemu/build.sh`,
   `core/qemu/tools/package-mac.sh`), the app exports as `FlightBench.app` with the core and data inside
   (`app/tools/export.sh`; signed with a Developer ID, notarized and stapled; arm64 app and core). Same bench, same
