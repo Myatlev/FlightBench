@@ -6,6 +6,7 @@
 #   app/tools/export.sh --presets rs7-first-flight   # release profile: these presets + their firmware only (v0.1)
 #   app/tools/export.sh --zip                  # also pack dist/FlightBench-macos-v<version>.zip (ditto, keeps the bundle's attributes)
 #   app/tools/export.sh --universal            # keep the x86_64 half of the app (default: arm64 only, like the core)
+#   app/tools/export.sh --suffix all-presets   # zip name FlightBench-macos-v<version>-<suffix>.zip (a test build next to the release one)
 #   app/tools/export.sh --sign "Developer ID Application: Name (TEAMID)"   # code-sign everything, hardened runtime
 #   app/tools/export.sh --sign ... --notarize <notarytool keychain profile>  # + notarize (xcrun notarytool) and staple
 # Godot: --godot <Godot .NET binary>, else $GODOT, else `godot` on PATH, else /Applications/Godot_mono.app.
@@ -26,12 +27,13 @@ set -euo pipefail
 HERE=$(cd "$(dirname "$0")" && pwd); APP=$(cd "$HERE/.." && pwd); REPO=$(cd "$APP/.." && pwd)
 [ "$(uname -s)" = Darwin ] || { echo "export.sh: run on macOS (Windows: export.ps1)" >&2; exit 1; }
 
-DATA_ONLY=; ZIP=; UNIVERSAL=; PRESETS=("*"); CORE_DIR=${CORE_DIR:-$REPO/dist/core}; GODOT=${GODOT:-}; SIGN=; NOTARIZE=
+DATA_ONLY=; ZIP=; UNIVERSAL=; SUFFIX=; PRESETS=("*"); CORE_DIR=${CORE_DIR:-$REPO/dist/core}; GODOT=${GODOT:-}; SIGN=; NOTARIZE=
 while [ $# -gt 0 ]; do
   case "$1" in
     --data-only) DATA_ONLY=1;;
     --zip) ZIP=1;;
     --universal) UNIVERSAL=1;;
+    --suffix) SUFFIX=-${2:?--suffix <text>}; shift;;
     --presets) IFS=', ' read -r -a PRESETS <<< "${2:?--presets <names>}"; shift;;
     --core-dir) CORE_DIR=${2:?}; shift;;
     --godot) GODOT=${2:?}; shift;;
@@ -177,7 +179,7 @@ fi
 
 echo "build: $(find "$OUT" -type f | wc -l | tr -d ' ') files, $(du -sh "$OUT" | cut -f1) -> $OUT"
 if [ -n "$ZIP" ]; then
-  zip=$REPO/dist/FlightBench-macos-$version.zip; rm -f "$zip"
+  zip=$REPO/dist/FlightBench-macos-$version$SUFFIX.zip; rm -f "$zip"
   (cd "$REPO/dist" && ditto -c -k --keepParent FlightBench-macos "$zip")
   echo "zip: $(du -h "$zip" | cut -f1) -> $zip"
 fi
