@@ -5,6 +5,7 @@
 #   app/tools/export.sh --data-only            # only refresh the bundle's data/
 #   app/tools/export.sh --presets rs7-first-flight   # release profile: these presets + their firmware only (v0.1)
 #   app/tools/export.sh --zip                  # also pack dist/FlightBench-macos-v<version>.zip (ditto, keeps the bundle's attributes)
+#   app/tools/export.sh --universal            # keep the x86_64 half of the app (default: arm64 only, like the core)
 #   app/tools/export.sh --sign "Developer ID Application: Name (TEAMID)"   # code-sign everything, hardened runtime
 #   app/tools/export.sh --sign ... --notarize <notarytool keychain profile>  # + notarize (xcrun notarytool) and staple
 # Godot: --godot <Godot .NET binary>, else $GODOT, else `godot` on PATH, else /Applications/Godot_mono.app.
@@ -25,11 +26,12 @@ set -euo pipefail
 HERE=$(cd "$(dirname "$0")" && pwd); APP=$(cd "$HERE/.." && pwd); REPO=$(cd "$APP/.." && pwd)
 [ "$(uname -s)" = Darwin ] || { echo "export.sh: run on macOS (Windows: export.ps1)" >&2; exit 1; }
 
-DATA_ONLY=; ZIP=; PRESETS=("*"); CORE_DIR=${CORE_DIR:-$REPO/dist/core}; GODOT=${GODOT:-}; SIGN=; NOTARIZE=
+DATA_ONLY=; ZIP=; UNIVERSAL=; PRESETS=("*"); CORE_DIR=${CORE_DIR:-$REPO/dist/core}; GODOT=${GODOT:-}; SIGN=; NOTARIZE=
 while [ $# -gt 0 ]; do
   case "$1" in
     --data-only) DATA_ONLY=1;;
     --zip) ZIP=1;;
+    --universal) UNIVERSAL=1;;
     --presets) IFS=', ' read -r -a PRESETS <<< "${2:?--presets <names>}"; shift;;
     --core-dir) CORE_DIR=${2:?}; shift;;
     --godot) GODOT=${2:?}; shift;;
@@ -56,6 +58,15 @@ if [ -z "$DATA_ONLY" ]; then
   mkdir -p "$OUT"; rm -rf "$BUNDLE"
   "$GODOT" --headless --path "$APP" --export-release macOS "$BUNDLE" 2>&1 | grep -viE 'editor_(fonts|theme)|HotReloadAssemblyWatcher|godot_icall|NativeCalls|CSharpInstanceBridge|ScriptMethods|at: start \(scene/main/timer|Unable to start the timer|Case mismatch|open_internal|^\[ *[0-9]+% \]|\[ DONE \]|^\[0m$|^$' || true
   [ -x "$BUNDLE/Contents/MacOS/FlightBench" ] || { echo "export.sh: export produced no $BUNDLE/Contents/MacOS/FlightBench" >&2; exit 1; }
+  # Godot's official macOS template is universal only (an `arm64` preset is refused: no godot_macos_release.arm64), so
+  # the export is universal; the core is arm64, so by default the app is thinned to arm64 too: the Godot binary's
+  # x86_64 slice and the x86_64 .NET runtime go (about a third of the bundle). --universal keeps them.
+  if [ -z "$UNIVERSAL" ]; then
+    exe=$BUNDLE/Contents/MacOS/FlightBench
+    if lipo "$exe" -verify_arch x86_64 2>/dev/null; then lipo "$exe" -thin arm64 -output "$exe.arm64" && mv "$exe.arm64" "$exe"; fi
+    rm -rf "$RES"/data_*_x86_64
+    echo "arch: arm64 only ($(lipo -archs "$exe")); --universal keeps the x86_64 half"
+  fi
 fi
 [ -d "$BUNDLE" ] || { echo "export.sh: no bundle at $BUNDLE (run without --data-only first)" >&2; exit 1; }
 

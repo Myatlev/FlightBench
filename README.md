@@ -130,7 +130,8 @@ Three steps on a clean Windows machine, nothing in the tree points at a particul
    ```
    GODOT=/Applications/Godot_mono.app/Contents/MacOS/Godot app/tools/export.sh --presets rs7-first-flight --zip
    ```
-   exports `dist/FlightBench-macos/FlightBench.app` (universal app, arm64 core, `data/` in `Contents/Resources`,
+   exports `dist/FlightBench-macos/FlightBench.app` (arm64 — Godot's export is universal, the script thins it to match
+   the arm64 core, `--universal` keeps both halves; `data/` in `Contents/Resources`,
    the core in `Contents/Helpers`), `LICENSE` + `README.txt` next to it, and the zip. Signed ad hoc unless
    `--sign "Developer ID Application: …"` (+ `--notarize <notarytool keychain profile>`); details: `app/README.md` → Export.
 3. **Check**: `FB_PRESET=rs7-first-flight FB_LIVE_CHECK=1 dist/FlightBench-macos/FlightBench.app/Contents/MacOS/FlightBench`

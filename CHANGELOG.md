@@ -3,7 +3,7 @@
 ## Unreleased
 - **macOS (Apple silicon)**: the core builds and packages on macOS (`core/qemu/build.sh`, `core/qemu/tools/package-mac.sh`),
   the app exports as `FlightBench.app` with the core and data inside (`app/tools/export.sh`, optional Developer ID
-  signing and notarization). Same bench, same two live-check PASS lines. The gate suite runs on macOS with its own
+  signing and notarization; arm64 app and core, 64 MB zip). Same bench, same two live-check PASS lines. The gate suite runs on macOS with its own
   flight baselines (`docs/contributing.md`).
 - Ctrl+L clears the CLI log on every platform (macOS also takes Cmd+L).
 

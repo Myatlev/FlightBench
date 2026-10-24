@@ -237,8 +237,9 @@ carries a `.gdignore`, so Godot neither imports nor packs it.
 ```
 ### macOS: `app/tools/export.sh`
 Preset **macOS** in `export_presets.cfg` (universal binary — the 4.7.2 template ships only `godot_macos_release.universal`,
-so `arm64` alone is refused; `rendering/textures/vram_compression/import_etc2_astc=true` in `project.godot` is required
-for it). `app/tools/export.sh` is the counterpart of `export.ps1`: Godot export → `dist/FlightBench-macos/FlightBench.app`,
+so an `arm64` preset is refused; `rendering/textures/vram_compression/import_etc2_astc=true` in `project.godot` is required
+for it). The script then thins the app to arm64 (`lipo -thin` on the Godot binary, the x86_64 .NET runtime removed) to match
+the arm64 core; `--universal` keeps both halves. `app/tools/export.sh` is the counterpart of `export.ps1`: Godot export → `dist/FlightBench-macos/FlightBench.app`,
 the same `data/` rules into `Contents/Resources/data/`, the core from `dist/core` (`core/qemu/tools/package-mac.sh`) into
 `Contents/Helpers/qemu-system-arm` + `Contents/Frameworks/*.dylib`, `LICENSE` + `README.txt` (`tools/dist-README-macos.txt`)
 next to the bundle; `--presets`, `--data-only`, `--zip`, `--core-dir`, `--godot` as in the PowerShell script. `CoreLocator`
@@ -254,8 +255,7 @@ runtime (a hardened ad-hoc core cannot load its own dylibs: library validation w
 building Mac only. `--sign "Developer ID Application: Name (TEAM)"` signs with the hardened runtime and a timestamp;
 `--notarize <profile>` (a `xcrun notarytool store-credentials` keychain profile) submits, waits, staples and asks
 Gatekeeper (`spctl --assess`). Check: `FB_PRESET=rs7-first-flight FB_LIVE_CHECK=1 dist/FlightBench-macos/FlightBench.app/Contents/MacOS/FlightBench`.
-Result (2026-10-24, M-series Mac): universal app 322 MB (two .NET runtimes) + arm64 core 32 MB → 355 MB, zip 129 MB;
-live-check 2 PASS. Self-tests run the same way (`FB_SELFTEST=all FB_CORE=127.0.0.1:31250 <Godot_mono.app>/Contents/MacOS/Godot --path app --headless`
+Result (2026-10-24, M-series Mac): arm64 app + core 195 MB, zip 64 MB (universal: 355 MB / 129 MB); live-check 2 PASS. Self-tests run the same way (`FB_SELFTEST=all FB_CORE=127.0.0.1:31250 <Godot_mono.app>/Contents/MacOS/Godot --path app --headless`
 with `python3 tools/fake_core.py`): 46/46.
 
 Result (2026-09-26): `FlightBench.exe` (~105 MB, engine + PCK) + `data_FlightBench_windows_x86_64/` (the .NET
