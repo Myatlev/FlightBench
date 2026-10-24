@@ -21,7 +21,8 @@ CLI lines) is explicit, reproducible and yours to edit.
 
 ## Quickstart
 Windows, about 10 minutes: unzip the release, run `FlightBench.exe`, open **RS7 · First flight** from the
-Presets list. Full walkthrough, including arming and flying: `docs/quickstart.md`.
+Presets list. macOS (Apple silicon): unzip, open `FlightBench.app`, the same preset. Full walkthrough,
+including arming and flying: `docs/quickstart.md`.
 
 ## Supported (v0.1)
 | board | firmware | aircraft | status |
@@ -29,7 +30,7 @@ Presets list. Full walkthrough, including arming and flying: `docs/quickstart.md
 | RadioMaster Nexus-XR (STM32F722) | RotorFlight 4.6.0, the official release hex | RS7 (Goosky RS7 Ultra, 700-class heli) | **v0.1** — preset "RS7 · First flight" |
 
 Planned: iNav on a fixed-wing bench, Betaflight on a quad, ArduPilot; an OSD preset (needs a firmware
-build with OSD compiled in); macOS.
+build with OSD compiled in); Linux desktop build. macOS (Apple silicon) builds from this tree, see below.
 
 Exact evidence for every claim above: `docs/status.md`.
 
@@ -69,7 +70,7 @@ only needed for flying by hand.
 core/       the emulator core: qemu/ (the machines, scripts, tests, evidence READMEs)
 fdm/        flight dynamics (C) with behavioural tests
 devices/    emulator-independent device & protocol models (C)
-app/        Godot .NET application (Windows)
+app/        Godot .NET application (Windows, macOS)
 boards/     board definitions: memory map / platform, unified config, quirks
 models/     aircraft: core description + visual assets
 presets/    bundled benches the app offers in Main menu → Presets
@@ -94,7 +95,7 @@ emulated RadioMaster Nexus-XR, configured over TCP by the stock configurator, fl
 transmitter, deterministic in lockstep. See `docs/status.md` for exactly what is verified.
 
 Next: iNav on a fixed-wing bench, then Betaflight on a quad, then ArduPilot; an OSD preset once a firmware
-build with OSD compiled in is bundled; macOS.
+build with OSD compiled in is bundled; a Linux desktop build.
 
 ## Building from source
 Three steps on a clean Windows machine, nothing in the tree points at a particular computer:
@@ -113,6 +114,27 @@ Three steps on a clean Windows machine, nothing in the tree points at a particul
    folder the build has no bundled core (Settings → Paths → core, or a remote core). Details: `app/README.md` → Export.
 3. **Check**: `FB_PRESET=rs7-first-flight FB_LIVE_CHECK=1 dist\FlightBench\FlightBench.exe` prints two `PASS` lines
    (the firmware answered, the RS7 took off from the keyboard) and exits.
+
+**macOS** (Apple silicon; Xcode command-line tools, Homebrew):
+1. **Core**: `brew install glib pixman pkgconf ninja meson python bison flex libslirp`, then
+   ```
+   PATH="/opt/homebrew/opt/bison/bin:/opt/homebrew/opt/flex/bin:$PATH" core/qemu/build.sh ~/qemu-src
+   core/qemu/tools/package-mac.sh ~/qemu-src/build      # -> dist/core/: qemu-system-arm + lib/*.dylib + CORE-MANIFEST.txt
+   ```
+   (`build.sh` configures with the Homebrew python — a pyenv shim may lack `tomli` — and puts the SDK's libraries
+   ahead of a stale `/usr/local/lib`; `package-mac.sh` relocates the Homebrew dylibs to `@rpath` and ad-hoc signs
+   the core with the JIT entitlements QEMU's TCG needs on Apple silicon.)
+2. **Client**: Godot 4.7.2 **.NET** for macOS (`Godot_mono.app`) with its export templates installed, and the .NET 8
+   SDK **at `/usr/local/share/dotnet`** (the official installer or `brew install --cask dotnet-sdk@8`): Godot's
+   exporter runs that `dotnet` when it exists, whatever is on `PATH`. Then
+   ```
+   GODOT=/Applications/Godot_mono.app/Contents/MacOS/Godot app/tools/export.sh --presets rs7-first-flight --zip
+   ```
+   exports `dist/FlightBench-macos/FlightBench.app` (universal app, arm64 core, `data/` in `Contents/Resources`,
+   the core in `Contents/Helpers`), `LICENSE` + `README.txt` next to it, and the zip. Signed ad hoc unless
+   `--sign "Developer ID Application: …"` (+ `--notarize <notarytool keychain profile>`); details: `app/README.md` → Export.
+3. **Check**: `FB_PRESET=rs7-first-flight FB_LIVE_CHECK=1 dist/FlightBench-macos/FlightBench.app/Contents/MacOS/FlightBench`
+   prints the same two `PASS` lines.
 
 **Linux core** (headless, no client): `core/qemu/build.sh`, then `core/qemu/run.sh --session <bench.json>`.
 

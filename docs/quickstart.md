@@ -1,4 +1,4 @@
-# Quickstart (Windows, ~10 minutes)
+# Quickstart (Windows and macOS, ~10 minutes)
 
 Fly a RotorFlight helicopter on your desk, with no real board — the exact firmware binary that a
 Nexus-XR flies, running on an emulated one.
@@ -8,6 +8,11 @@ Nexus-XR flies, running on an emulated one.
 Download `FlightBench-win64-v0.1.0.zip` from https://github.com/Myatlev/flightbench/releases and unzip it
 anywhere. The archive holds one folder, `FlightBench/`: `FlightBench.exe`, a `data/` folder next to it (the
 bundled core and firmware), `README.txt` and `LICENSE`. Run `FlightBench.exe` — nothing else to install.
+
+macOS (Apple silicon): `FlightBench-macos-v<version>.zip` holds `FlightBench.app`, `README.txt` and `LICENSE`; open the
+app (the core and the data travel inside the bundle). Everything below is the same; where it says `FlightBench.exe`,
+read `FlightBench.app`. A build that is not signed with a Developer ID is refused by Gatekeeper on another Mac — right-click
+→ Open, or `xattr -dr com.apple.quarantine FlightBench.app`; the published builds will be signed and notarized.
 
 ![Main menu on first run](img/main-menu-first-run.png)
 *Caption: the main menu's first-run state — the Presets list on top with the "Start with a preset" hint.*

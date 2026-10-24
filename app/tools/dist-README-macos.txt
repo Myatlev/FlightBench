@@ -2,7 +2,7 @@ FlightBench {{VERSION}} - macOS build ({{COMMIT}}, {{DATE}})
 Fly the real flight-controller firmware binary on an emulated flight controller.
 
 Quick start
-  1. Open FlightBench.app (nothing to install; Apple silicon and Intel).
+  1. Open FlightBench.app (nothing to install; Apple silicon — the core is an arm64 binary).
   2. Open "RS7 - First flight" from the Presets list.
   3. Watch the Status window until the firmware line reads "disarmed", then arm from the Transmitter window.
   Walkthrough with screenshots: https://github.com/Myatlev/flightbench/blob/main/docs/quickstart.md

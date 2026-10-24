@@ -18,7 +18,7 @@ this repository).
 | Inverted flight: rolled past the side with negative collective the RS7 holds and climbs at a bounded rate (full negative collective: about 17 m/s, like full positive upright); before 2026-10-23 a vertical-speed coefficient drove it to millions of m/s within seconds | `fdm/tests/test_heli.c` → claim 3 (`inverted_tests` (`make -C fdm test`); `docs/decisions.md` 2026-10-23 (evening) |
 | Modes/switches are derived from the firmware's own MSP mode tables (`MODE_RANGES`, `BOXNAMES`/`BOXIDS`), including RotorFlight's AND-linked ranges | `evidence/modes/README.md` |
 | A given bench + pilot script is bit-for-bit deterministic on a given platform: two runs give byte-identical FDM logs | `evidence/determinism/README.md`; `docs/contributing.md` gates table |
-| The gate suite holds: on Linux the whole of it (host unit tests, `equiv` against the Python reference resolver, the baseline flights); on the Windows build the host unit tests and the RS7 flight against the Windows baseline (`equiv` there has the `~` mismatch below) | `docs/contributing.md` → Gates; `evidence/pin-mode/README.md` (Linux and Windows gate logs) |
+| The gate suite holds: on Linux the whole of it (host unit tests, `equiv` against the Python reference resolver, the baseline flights); on the Windows build the host unit tests and the RS7 flight against the Windows baseline (`equiv` there has the `~` mismatch below); on macOS (arm64 core, 2026-10-24) the whole suite: host, `equiv` 251/251, RS7 and trainer flights deterministic x2 with their own baselines | `docs/contributing.md` → Gates; `evidence/pin-mode/README.md` (Linux and Windows gate logs) |
 
 ## Not verified
 
@@ -38,4 +38,5 @@ this repository).
 | Blackbox flash | No emulated SPI flash for the firmware to write real blackbox logs to; planned later (`docs/ui.md` → Signals). Use the Signals window / CSV recording instead. |
 | Compass field is fixed, not tied to the environment's location | The modelled compass's declination/inclination/intensity are device properties and do not follow the aircraft's `env` home position. `evidence/sensors/README.md` |
 | Adding a new board is not documented | Planned for v0.2 (`docs/add-a-board.md`, not written yet). |
-| Other firmwares and aircraft | iNav on a fixed-wing bench, Betaflight on a quad, ArduPilot, a second helicopter, macOS — roadmap items beyond v0.1; see `README.md` → Status/roadmap. |
+| Other firmwares and aircraft | iNav on a fixed-wing bench, Betaflight on a quad, ArduPilot, a second helicopter, a Linux desktop build — roadmap items beyond v0.1; see `README.md` → Status/roadmap. |
+| macOS build | `app/tools/export.sh` makes `FlightBench.app` (universal Godot/.NET app, **arm64 core**: on an Intel Mac the app starts without a bundled core). Verified on an M-series Mac: self-tests 46/46, live-check 2 PASS from the exported bundle (RS7 lifts off from the keyboard, realtime 0.98×). Not yet: a Developer ID signature and notarization (an ad-hoc bundle runs only on the Mac that built it), a flight with a real transmitter on macOS, an Intel Mac. |
