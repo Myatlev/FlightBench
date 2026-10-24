@@ -1,0 +1,21 @@
+diff --git a/scripts/symlink-install-tree.py b/scripts/symlink-install-tree.py
+index b725638..b524c16 100644
+--- a/scripts/symlink-install-tree.py
++++ b/scripts/symlink-install-tree.py
+@@ -30,7 +30,14 @@ def destdir_join(d1: str, d2: str) -> str:
+     except BaseException as e:
+         if not isinstance(e, OSError) or e.errno != errno.EEXIST:
+             if os.name == 'nt':
+-                print('Please enable Developer Mode to support soft link '
+-                      'without Administrator permission')
++                # FlightBench: no symlink privilege (Developer Mode off) -> copy instead
++                import shutil
++                if not os.path.exists(source):
++                    continue  # build output not made yet (e.g. subproject DLL); copied after the build
++                if os.path.isdir(source):
++                    shutil.copytree(source, bundle_dest, dirs_exist_ok=True)
++                else:
++                    shutil.copy2(source, bundle_dest)
++                continue
+             print(f'error making symbolic link {dest}', file=sys.stderr)
+             raise e

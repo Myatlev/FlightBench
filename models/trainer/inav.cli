@@ -1,0 +1,191 @@
+# Trainer on stock iNav 9.1.0: the aircraft part of the configuration (the board part - ports,
+# serial, alignment - is the board script, boards/, owned by the F405 machine work).
+# Sent as CLI over the MSP UART by the core, then `save` (docs/spike-inav-plane-2026-09-30.md A2, A3).
+#
+# The configuration a user gets from the iNav Configurator 9.1.1: the first-connect "Default values"
+# dialog's "Airplane with a Tail" (js/defaults_dialog_entries.js:373-593: preset id 3, mixer preset
+# 14) and the Mixer tab's "Airplane" preset 14 (js/model.js:399-427), written the way the
+# configurator writes them (js/defaults_dialog.js:203-293), then our servo reversals, switches and
+# the output enable. models/trainer/README.md "Configuration" has the references and what changed.
+
+# --- the defaults dialog's settings, outside the profiles (defaults_dialog.js:228-232) ----------
+# The two configurator flags: applied_defaults > 0 keeps the dialog closed on connect
+# (defaults_dialog.js:33-36); model_preview_type is the mixer preset id the Status tab reads from
+# MSP2_INAV_MIXER (appliedMixerPreset: -1 = the red "Mixer not configured", tabs/setup.js:318).
+set model_preview_type = 14
+set platform_type = AIRPLANE
+set applied_defaults = 3
+set looptime = 1000
+set gyro_main_lpf_hz = 25
+set dynamic_gyro_notch_enabled = ON
+set dynamic_gyro_notch_q = 250
+set dynamic_gyro_notch_min_hz = 30
+set motor_pwm_protocol = STANDARD
+set ahrs_inertia_comp_method = ADAPTIVE
+set nav_fw_bank_angle = 35
+set nav_fw_alt_control_response = 45
+set airmode_type = STICK_CENTER_ONCE
+set small_angle = 180
+set nav_fw_control_smoothness = 2
+set nav_rth_allow_landing = FS_ONLY
+set nav_rth_altitude = 5000
+set nav_wp_radius = 800
+set nav_wp_max_safe_distance = 500
+set nav_fw_launch_max_angle = 45
+set nav_fw_launch_motor_delay = 100
+set nav_fw_launch_max_altitude = 5000
+# Not settings in 9.1.0, skipped by the configurator too ("Invalid setting", MSPHelper.js:3496; the
+# firmware's name lookup is strcmp, fc/settings.c:120): gyro_hardware_lpf, nav_fw_pos_z_FF.
+# nav_fw_alt_control_response is a PID-profile setting the configurator does not list as one
+# (js/fc.js getControlProfileParameters): it lands in the current profile only, as here (profile 1).
+
+# --- control profile settings, on all three profiles (defaults_dialog.js:235-243) ---------------
+control_profile 1
+set dterm_lpf_hz = 10
+set d_boost_min = 1.000
+set d_boost_max = 1.000
+set rc_expo = 30
+set rc_yaw_expo = 30
+set roll_rate = 18
+set pitch_rate = 9
+set yaw_rate = 3
+set nav_fw_pos_xy_p = 55
+set fw_turn_assist_pitch_gain = 0.400
+set max_angle_inclination_rll = 450
+set fw_p_pitch = 15
+set fw_i_pitch = 5
+set fw_d_pitch = 5
+set fw_ff_pitch = 80
+set fw_p_roll = 15
+set fw_i_roll = 3
+set fw_d_roll = 7
+set fw_ff_roll = 50
+set fw_p_yaw = 50
+set fw_i_yaw = 0
+set fw_d_yaw = 20
+set fw_ff_yaw = 255
+set nav_fw_pos_z_p = 22
+set nav_fw_pos_z_i = 6
+set nav_fw_pos_z_d = 2
+set tpa_rate = 80
+control_profile 2
+set dterm_lpf_hz = 10
+set d_boost_min = 1.000
+set d_boost_max = 1.000
+set rc_expo = 30
+set rc_yaw_expo = 30
+set roll_rate = 18
+set pitch_rate = 9
+set yaw_rate = 3
+set nav_fw_pos_xy_p = 55
+set fw_turn_assist_pitch_gain = 0.400
+set max_angle_inclination_rll = 450
+set fw_p_pitch = 15
+set fw_i_pitch = 5
+set fw_d_pitch = 5
+set fw_ff_pitch = 80
+set fw_p_roll = 15
+set fw_i_roll = 3
+set fw_d_roll = 7
+set fw_ff_roll = 50
+set fw_p_yaw = 50
+set fw_i_yaw = 0
+set fw_d_yaw = 20
+set fw_ff_yaw = 255
+set nav_fw_pos_z_p = 22
+set nav_fw_pos_z_i = 6
+set nav_fw_pos_z_d = 2
+set tpa_rate = 80
+control_profile 3
+set dterm_lpf_hz = 10
+set d_boost_min = 1.000
+set d_boost_max = 1.000
+set rc_expo = 30
+set rc_yaw_expo = 30
+set roll_rate = 18
+set pitch_rate = 9
+set yaw_rate = 3
+set nav_fw_pos_xy_p = 55
+set fw_turn_assist_pitch_gain = 0.400
+set max_angle_inclination_rll = 450
+set fw_p_pitch = 15
+set fw_i_pitch = 5
+set fw_d_pitch = 5
+set fw_ff_pitch = 80
+set fw_p_roll = 15
+set fw_i_roll = 3
+set fw_d_roll = 7
+set fw_ff_roll = 50
+set fw_p_yaw = 50
+set fw_i_yaw = 0
+set fw_d_yaw = 20
+set fw_ff_yaw = 255
+set nav_fw_pos_z_p = 22
+set nav_fw_pos_z_i = 6
+set nav_fw_pos_z_d = 2
+set tpa_rate = 80
+control_profile 1
+
+# --- battery profile settings, on all three profiles (defaults_dialog.js:245-252) ---------------
+battery_profile 1
+set throttle_idle = 5.000
+battery_profile 2
+set throttle_idle = 5.000
+battery_profile 3
+set throttle_idle = 5.000
+battery_profile 1
+
+# --- the mixer preset 14 "Airplane" (defaults_dialog.js:256-276, model.js:399-427) --------------
+# MSP2_INAV_SET_MIXER: platform AIRPLANE, motorStopOnLow, hasFlaps (FLAPERON mode offered),
+# appliedMixerPreset 14 (model_preview_type above).
+set has_flaps = ON
+set motorstop_on_low = ON
+# motor: one, full throttle
+mmix reset
+mmix 0 1.0 0.0 0.0 0.0
+# servo mixer: smix <rule> <servo> <input> <weight> <speed> <logic condition>
+# inputs: 0 STABILIZED_ROLL, 1 STABILIZED_PITCH, 2 STABILIZED_YAW. The preset's rules, all +100,
+# on this model's servo numbers (the preset numbers servo 1 elevator, 2/3 flaperons, 4 rudder; the
+# bench is wired servo 1..4 = aileron_l, aileron_r, elevator, rudder on S3..S6, and the Mixer tab
+# labels the outputs from the rules, tabs/mixer.js renderServoOutputImage, so it shows them right).
+smix reset
+smix 0 1 0 100 0 -1
+smix 1 2 0 100 0 -1
+smix 2 3 1 100 0 -1
+smix 3 4 2 100 0 -1
+
+# --- servo directions: the Outputs tab's reverse = servo rate -100 --------------------------------
+# servo <n> <min> <max> <middle> <rate>. The FDM's surface conventions (fdm/include/fb/plane_fdm.h):
+# +us = aileron trailing edge down, elevator trailing edge up (nose up), rudder trailing edge right.
+# aileron_r reversed (roll right: left aileron down, right up); elevator and rudder reversed
+# (checked on the stand, phase 3): iNav's axes are X forward, Y left, Z up, so a positive
+# STABILIZED_PITCH is nose down and a positive STABILIZED_YAW nose left, while the FDM's +us is nose
+# up and nose right. Servo output = mixer weight x servo rate (flight/servos.c:466,474): the same
+# pulses as the earlier -100 smix weights.
+servo 2 1000 2000 1500 -100
+servo 3 1000 2000 1500 -100
+servo 4 1000 2000 1500 -100
+
+# --- outputs on: the Outputs tab's "Enable motor and servo output" is this feature --------------
+# (tabs/outputs.html:11, bit 28; not in the target's DEFAULT_FEATURES). Off, iNav drives the
+# motor and servo pads low as plain GPIO (drivers/pwm_output.c:189-196): no pulses on real hardware.
+feature PWM_OUTPUT_ENABLE
+
+# modes: aux <n> <mode permanent id> <aux channel, 0 = ch5> <start> <end>
+# ARM (0) on ch5 high, ANGLE (1) on ch6 high, NAV LAUNCH (36) on ch7 high
+aux 0 0 0 1700 2100
+aux 1 1 1 1700 2100
+aux 2 36 2 1700 2100
+
+# NAV LAUNCH by the ch7 switch, not `feature FW_LAUNCH`: with the feature iNav hides the NAV LAUNCH
+# box (fc/fc_msp_box.c) and launch mode is always on once armed, which blocks the ground take-off
+# scenario. GPS: no line here; the wired `ublox` device's lines (feature GPS, serial 2 +1,
+# gps_provider, gps_ublox_nav_hz) come after this script (devices/README.md). The compass and the
+# battery need no line: iNav's AUTO finds the QMC5883L, and the target's VBAT/CURRENT defaults
+# (vbat_scale 1100, current_meter_scale 195) read the battery; the cell count is auto-detected.
+
+# The launch this aircraft is sized for (iNav defaults unless noted):
+# nav_fw_launch_accel 1863 cm/s^2, detect_time 40 ms, max_angle 45 (preset, = default), thr 1700,
+# motor_delay 100 ms (preset; default 500), spinup_time 100 ms, climb_angle 18, max_altitude 50 m
+# (preset; default 0 = none). The `launch` default (50 km/h in 0.5 s at 10 deg) gives 29.5 m/s^2 on
+# the IMU X for 0.5 s, then the model climbs at 18 deg on 1700 us (fdm/evidence/plane-2026-09-30.md).

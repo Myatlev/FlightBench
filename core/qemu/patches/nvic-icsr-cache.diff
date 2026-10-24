@@ -1,0 +1,74 @@
+diff --git a/hw/intc/armv7m_nvic.c b/hw/intc/armv7m_nvic.c
+index a7651f8..8aeb367 100644
+--- a/hw/intc/armv7m_nvic.c
++++ b/hw/intc/armv7m_nvic.c
+@@ -146,6 +146,13 @@ static bool nvic_isrpending(NVICState *s)
+     return false;
+ }
+ 
++/* ICSR bits derived from all vectors; see NVICState.icsr_isrpending */
++static void nvic_recompute_icsr(NVICState *s)
++{
++    s->icsr_isrpending = nvic_isrpending(s);
++    s->icsr_rettobase = nvic_rettobase(s);
++}
++
+ static bool exc_is_banked(int exc)
+ {
+     /* Return true if this is one of the limited set of exceptions which
+@@ -307,6 +314,7 @@ static void nvic_recompute_state_secure(NVICState *s)
+                                       s->vectpending_is_s_banked,
+                                       s->vectpending_prio,
+                                       s->exception_prio);
++    nvic_recompute_icsr(s);
+ }
+ 
+ /* Recompute vectpending and exception_prio */
+@@ -356,6 +364,7 @@ static void nvic_recompute_state(NVICState *s)
+     trace_nvic_recompute_state(s->vectpending,
+                                s->vectpending_prio,
+                                s->exception_prio);
++    nvic_recompute_icsr(s);
+ }
+ 
+ /* Return the current execution priority of the CPU
+@@ -1072,11 +1081,11 @@ static uint32_t nvic_readl(NVICState *s, uint32_t offset, MemTxAttrs attrs)
+             val |= (vp & 0x1ff) << 12;
+         }
+         /* ISRPENDING - set if any external IRQ is pending */
+-        if (nvic_isrpending(s)) {
++        if (s->icsr_isrpending) {
+             val |= (1 << 22);
+         }
+         /* RETTOBASE - set if only one handler is active */
+-        if (nvic_rettobase(s)) {
++        if (s->icsr_rettobase) {
+             val |= (1 << 11);
+         }
+         if (attrs.secure) {
+@@ -2673,6 +2682,7 @@ static void armv7m_nvic_reset(DeviceState *dev)
+     s->vectpending = 0;
+     s->vectpending_is_s_banked = false;
+     s->vectpending_prio = NVIC_NOEXC_PRIO;
++    nvic_recompute_icsr(s);
+ 
+     if (arm_feature(&s->cpu->env, ARM_FEATURE_M_SECURITY)) {
+         memset(s->itns, 0, sizeof(s->itns));
+diff --git a/include/hw/intc/armv7m_nvic.h b/include/hw/intc/armv7m_nvic.h
+index e699546..bd68874 100644
+--- a/include/hw/intc/armv7m_nvic.h
++++ b/include/hw/intc/armv7m_nvic.h
+@@ -75,6 +75,13 @@ struct NVICState {
+     bool vectpending_is_s_banked;
+     int exception_prio; /* group prio of the highest prio active exception */
+     int vectpending_prio; /* group prio of the exception in vectpending */
++    /*
++     * ICSR.ISRPENDING and ICSR.RETTOBASE, kept by nvic_recompute_state():
++     * it runs after every change of a vector's state, ICSR is read far more
++     * often (a scan of all vectors per read otherwise)
++     */
++    bool icsr_isrpending;
++    bool icsr_rettobase;
+ 
+     MemoryRegion sysregmem;
+ 

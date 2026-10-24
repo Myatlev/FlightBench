@@ -1,0 +1,57 @@
+Godot Engine v4.7.2.stable.mono.official.ed1daf0bf - https://godotengine.org
+Vulkan 1.4.351 - Forward+ - Using Device #0: NVIDIA - NVIDIA GeForce RTX 3070
+
+[app] repo root <install>\data
+[dev] UI scale 1.0 (setting 'auto', screen dpi 96)
+[app] core <install>\data\core\qemu-system-arm.exe (bundled data/core); data root <install>\data
+[app] aircraft visual: <install>/data/models/trainer/visual/trainer.tscn
+[app] preset 'Trainer · NAV LAUNCH': a bench of that name exists (<install>/benches/Trainer_NAV_LAUNCH.json): opened it as it is, the preset was not copied again
+FlightBench flight screen: bench 'Trainer · NAV LAUNCH' (speedybee-f405-wing/trainer); manifest cache user://manifest.json (flightbench-qemu 0.1): 15 devices (11 modelled, 18 ports), 21 faults, 2 boards (39 pads), 2 aircraft; FB_*: FB_BENCH_DIR=<install>\benches FB_CORE_PORTS=31296 FB_PRESET=inav-trainer-launch FB_RC_OFF=1 FB_SCREENSHOT=<install>\shots\plane-launch.png FB_SCREENSHOT_ALT=10
+[app] core <install>\data\core\qemu-system-arm.exe (bundled data/core), data root <install>\data; FB_CORE_PORTS: this run's ports control 31296, msp 31297, monitor 31298, motion 31299, pilot 31300 (the bench keeps its own)
+[app] core: <install>/benches/sessions/Trainer_NAV_LAUNCH.session.json (root <install>\data), ports control 31296, msp 31297, monitor 31298, motion 31299, pilot 31300
+[app] bench check: machine speedybee-f405-wing, icount shift=2, realtime on, control 31250, msp 31235, 1 session note(s)
+[app] bench state: <install>/benches/state/Trainer_NAV_LAUNCH.state.bin (the firmware config of this bench, kept across restarts; Bench → Reset firmware config to first start… discards it)
+[app] core started: pid 14124, control 31296, msp 31297, monitor 31298, motion 31299, pilot 31300
+[app] connecting to 127.0.0.1:31296
+[app] connected
+[app] manifest: live core (flightbench-qemu 0.1): 15 devices (11 modelled, 18 ports), 21 faults, 2 boards (39 pads), 2 aircraft
+[app] core published 105 signals
+[config:] (replay: happened before this client connected) restored this bench's saved config (calibrations, modes and settings as last saved; no script, no calibration) (t = 0.14 s)
+[event] pose {"label":"launch attitude","step":1,"scenario":"launch"} (t = 1.00 s)
+[event] beep {"on":false} (t = 2.19 s)
+[event] beep ×9 more (t = 2.21..2.41 s, collapsed)
+[event] beep {"on":false} (t = 2.44 s)
+[event] beep ×9 more (t = 2.46..2.66 s, collapsed)
+[event] beep {"on":false} (t = 3.46 s)
+[app] configurator address for the iNav Configurator: 127.0.0.1:31297 (the firmware answered)
+[event] beep ×1 more (t = 3.56..3.56 s, collapsed)
+[event] beep {"on":false} (t = 3.66 s)
+[event] beep ×1 more (t = 3.66..3.66 s, collapsed)
+[event] beep {"on":false} (t = 7.47 s)
+[event] beep ×7 more (t = 7.67..8.37 s, collapsed)
+[event] beep {"on":false} (t = 20.12 s)
+[event] beep ×15 more (t = 20.16..20.94 s, collapsed)
+[event] beep {"on":false} (t = 55.01 s)
+[event] beep ×3 more (t = 55.03..55.23 s, collapsed)
+[event] beep {"on":false} (t = 56.01 s)
+[event] armed {} (t = 56.07 s)
+[event] beep ×12 more (t = 56.06..56.97 s, collapsed)
+[event] beep {"on":true} (t = 57.02 s)
+[event] beep ×3 more (t = 57.07..58.01 s, collapsed)
+[event] beep {"on":true} (t = 58.06 s)
+[function] launch: running… 0/1: 50 km/h in 0.5 s at 10 deg (t = 59.00 s)
+[function] launch: step 0/1: the ramp to 13.89 m/s (t = 59.00 s)
+[event] launch: ramp… 50 km/h at 27.8 m/s², pitch 10°, heading 0° (t = 59.00 s)
+[event] launch_command {"label":"","step":2,"scenario":"launch"} (t = 59.00 s)
+[event] scenario 'launch' ended (t = 59.00 s)
+[event] beep ×2 more (t = 58.11..58.16 s, collapsed)
+[event] beep {"on":false} (t = 59.16 s)
+[function] launch: done: released at 13.89 m/s, 0.60 m (t = 59.50 s)
+[event] launch: released at 13.9 m/s, 0.60 m (t = 59.50 s)
+[event] beep ×5 more (t = 59.16..59.32 s, collapsed)
+[event] beep {"on":false} (t = 60.33 s)
+[event] beep ×5 more (t = 60.33..60.49 s, collapsed)
+[event] beep {"on":false} (t = 61.49 s)
+[dev] FB_SCREENSHOT_ALT=10: alt 10,05 m at t = 62,08 s, screenshot saved to <install>\shots\plane-launch.png; quitting
+FlightBench flight exiting: 6203 states, last t = 62,16 s, signals 105 traces / 6203 samples, csv rows 0, commands dropped 0
+[app] closing the bench: stopping core pid 14124

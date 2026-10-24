@@ -1,0 +1,52 @@
+# edge cases of the normaliser (cli_norm.h)
+set a = 1
+set  B=2.50
+set c =
+set = 3
+set d
+feature GPS
+feature -TELEMETRY
+feature
+beeper -
+serial 2 +1
+serial 2 +3
+serial 4 -0
+serial 5 1 115200 57600 0 115200
+serial 5 +2
+aux 0 0 0 1700 2100
+aux 1 1 1 1700 2100
+control_profile 2
+set roll_rate = 20
+profile 3
+set roll_rate = 30
+mixer_profile 2
+smix 0 1 0 100 0 -1
+smix reset
+smix 1 2 0 100 0 -1
+mixer_profile 1
+mmix 0 1.0 0 0 0
+mmix 1 1 0 0 0
+mmix reset
+mmix 0 1.000 0.000 0.000 0.000
+map TAER1234
+resource MOTOR 1 B06
+osd_layout 0 1 2 3 V
+led 0 0,0::C:0
+some_command x  y
+Set E = On
+set f = 0x10
+set g = 1e3
+set h = inf
+blackbox -NAV_ACC
+mode_color 1 2 3
+batch start
+defaults noreboot
+save
+serial 5 +4294967297
+profile 0
+set p_pitch = 50
+rateprofile 0
+set roll_rc_rate = 100
+rateprofile 2
+set roll_rc_rate = 120
+profile 1

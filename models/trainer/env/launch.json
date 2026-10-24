@@ -1,0 +1,8 @@
+{"name": "launch",
+ "description": "Default plane environment: the model sits on the pad, is rotated onto the launch attitude (hand or rail, 10 deg nose up) and waits for a `launch` command, which uses the parameters below unless the command overrides them. Give the launch step a number instead of null to launch automatically at that time. 50 km/h in 0.5 s is 27.8 m/s^2 (IMU X 29.5 m/s^2 at 10 deg): above 1.2 x iNav's nav_fw_launch_accel (18.63 m/s^2) for the whole 0.5 s ramp, so NAV LAUNCH's bungee detector fires.",
+ "launch": {"speed_kmh": 50, "duration_s": 0.5, "pitch_deg": 10, "heading_deg": null},
+ "steps": [
+  {"at_s": 0, "action": "pad"},
+  {"at_s": 0.5, "action": "hold", "euler_deg": [0, 10, null], "rotate_s": 0.5, "event": "pose", "label": "launch attitude"},
+  {"at_s": null, "action": "launch", "event": "launch_command"}
+ ]}

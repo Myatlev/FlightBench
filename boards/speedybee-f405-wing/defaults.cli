@@ -1,0 +1,9 @@
+# SpeedyBee F405 WING (iNav 9.1.0, SPEEDYBEEF405WING): the board's base CLI script.
+# The core sends it over the MSP UART (USART6) on first boot, before the aircraft's script
+# (aircraft.json `firmware_cli`), the bench profiles and the wired devices' lines, then saves.
+# Only what the emulated board needs on top of the target defaults
+# (target/SPEEDYBEEF405WING/config.c:36-38: USART1 = CRSF receiver, USART3 = GPS, USART6 = MSP).
+# Nothing today: GPS stays off by the target's DEFAULT_FEATURES (target.h:159) unless a GPS is
+# wired (the `ublox` device's lines: feature GPS, serial <n> +1, gps_provider, gps_ublox_nav_hz);
+# the onboard baro (SPL06) and a wired compass are found by iNav's autodetect.
+# The aircraft's settings (platform_type, mixer, modes) belong in the aircraft's script, not here.

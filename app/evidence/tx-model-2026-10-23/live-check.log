@@ -1,0 +1,49 @@
+Godot Engine v4.7.2.stable.mono.official.ed1daf0bf - https://godotengine.org
+Vulkan 1.4.351 - Forward+ - Using Device #0: NVIDIA - NVIDIA GeForce RTX 3070
+
+[dev] FB_NO_JOY: no joypad read this run (1 connected, ignored): the keyboard is the transmitter
+[app] repo root %USERPROFILE%\AppData\Local\Temp\fb-txlive-run3\FlightBench\data
+[dev] UI scale 1.0 (setting 'auto', screen dpi 96)
+[app] core %USERPROFILE%\AppData\Local\Temp\fb-txlive-run3\FlightBench\data\core\qemu-system-arm.exe (bundled data/core); data root %USERPROFILE%\AppData\Local\Temp\fb-txlive-run3\FlightBench\data
+[app] no manifest yet: reading it from the core
+[app] aircraft visual: %USERPROFILE%/AppData/Local/Temp/fb-txlive-run3/FlightBench/data/models/rs7/visual/rs7.tscn
+[app] preset 'RS7 · First flight' copied to %USERPROFILE%/AppData/Local/Temp/fb-txlive-run3/appdata/Godot/app_userdata/FlightBench/benches/RS7_First_flight.json (from %USERPROFILE%\AppData\Local\Temp\fb-txlive-run3\FlightBench\data\presets\rs7-first-flight.json)
+FlightBench flight screen: bench 'RS7 · First flight' (nexus-xr/rs7); manifest built-in fallback: 7 devices (7 modelled, 0 ports), 0 faults, 2 boards (0 pads), 2 aircraft; FB_*: FB_CORE_PORTS=31290 FB_LIVE_CHECK=1 FB_NO_JOY=1 FB_PRESET=rs7-first-flight FB_SCREENSHOT=<scratch>\tx-model-logs\run3\live.png
+[app] core %USERPROFILE%\AppData\Local\Temp\fb-txlive-run3\FlightBench\data\core\qemu-system-arm.exe (bundled data/core), data root %USERPROFILE%\AppData\Local\Temp\fb-txlive-run3\FlightBench\data; FB_CORE_PORTS: this run's ports control 31290, msp 31291, monitor 31292, motion 31293, pilot 31294 (the bench keeps its own)
+[app] manifest: live core (flightbench-qemu 0.1): 15 devices (11 modelled, 18 ports), 21 faults, 2 boards (39 pads), 2 aircraft
+[app] manifest from the core: live core (flightbench-qemu 0.1): 15 devices (11 modelled, 18 ports), 21 faults, 2 boards (39 pads), 2 aircraft
+[app] core: %USERPROFILE%/AppData/Local/Temp/fb-txlive-run3/appdata/Godot/app_userdata/FlightBench/sessions/RS7_First_flight.session.json (root %USERPROFILE%\AppData\Local\Temp\fb-txlive-run3\FlightBench\data), ports control 31290, msp 31291, monitor 31292, motion 31293, pilot 31294
+[app] bench check: machine nexus-xr, icount shift=2, realtime on, control 31250, msp 31235, 2 session note(s)
+[app] bench state: %USERPROFILE%/AppData/Local/flightbench/config/RS7_First_flight.state.bin (the firmware config of this bench, kept across restarts; Bench → Reset firmware config to first start… discards it)
+[app] core started: pid 27724, control 31290, msp 31291, monitor 31292, motion 31293, pilot 31294
+[app] connecting to 127.0.0.1:31290
+[app] connected
+[app] manifest: live core (flightbench-qemu 0.1): 15 devices (11 modelled, 18 ports), 21 faults, 2 boards (39 pads), 2 aircraft
+[app] core published 105 signals
+[dev] screenshot saved to <scratch>\tx-model-logs\run3\live.png
+[app] configurator address for the RotorFlight configurator: tcp://127.0.0.1:31291 (the firmware answered)
+[app] bench switches: none → ch5 ARM (refreshed from the firmware's modes)
+[live-check] screenshot <scratch>\tx-model-logs\run3\live.png
+[app] firmware config: asked the core for its last diff (cached: the firmware is not touched)
+[app] [live-check] no diff kept by the core: Refresh from firmware (reboots the firmware)
+[app] firmware config: refresh from the firmware — the core enters the CLI, runs diff all and leaves with exit: the firmware reboots (disarmed; re-arm yourself)
+[event] cli {"open":true,"by":"core","via":"control"} (t = 8.33 s)
+[event] cli {"open":false,"by":"core","via":"control"} (t = 8.53 s)
+[event] reboot {"cause":"reset"} (t = 8.53 s)
+[app] firmware answered 4,5 s after the reboot (the configurator can connect again)
+[live-check] PASS: Transmitter 'modes: from firmware (t = 10.19 s) · ch6 throttle: bench switch' switches [ch5 (AUX1): — | ARM; ch6 throttle (bench switch2): — | —] (variant RTFL); Functions [calibrate_acc, calibrate_gyro] from live core; Config 'diff all from the firmware (on request, t = 8.36 s, 2026-10-23 13:26), 42 lines'; Status 'connected · realtime 1.00× · 100 states/s' / 'disarmed · [ACRO] · cpu 9%' / 'OSD: none · baro -0.01 m'; Aircraft rows alt,speed,power,surfaces; configurator tcp://127.0.0.1:31291; core Core: running · pid 27724 · control 31290, msp 31291
+[live-check] screenshot <scratch>\tx-model-logs\run3\live-views.png
+[live-check] take-off: rows [ch5 (AUX1): — | ARM; ch6 throttle (bench switch2): — | —], header 'modes: from firmware (t = 10.19 s) · ch6 throttle: bench switch', joypad none (keyboard), keys switch_1 '5' switch_2 '6'
+[app] [live-check] key '5' (switch_1) pressed
+[app] switch ch5 (key): ARM (2000 µs)
+[event] armed {} (t = 16.71 s)
+[live-check] take-off: armed at t = 16.71 s (key '5', ch5 2000 µs)
+[app] [live-check] key '6' (switch_2) pressed
+[app] switch ch6 (key): — (2000 µs)
+[live-check] take-off: head 1602 rpm at t = 24.21 s (7.5 virtual s after the throttle switch, ch6 2000 µs); holding W
+[live-check] screenshot <scratch>\tx-model-logs\run3\live-spool.png
+[live-check] PASS: take-off from the keyboard: armed at t = 16.71 s (key '5' → ch5 2000 µs), throttle on (key '6' → ch6 2000 µs), W held 1.7 virtual s (ch3 1837 µs) → altitude 0.52 m at t = 25.87 s, head 1776 rpm; Aircraft 'head 1776 rpm · motor 15850 rpm · collective +15.5° · thrust 136 N · throttle 71%'
+[live-check] screenshot <scratch>\tx-model-logs\run3\live-airborne.png
+FlightBench flight exiting: 2717 states, last t = 27,38 s, signals 105 traces / 2717 samples, csv rows 0, commands dropped 0
+[app] closing the bench: stopping core pid 27724
+exit 0

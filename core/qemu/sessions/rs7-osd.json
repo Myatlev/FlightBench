@@ -1,0 +1,11 @@
+{"board":"nexus-xr","firmware":"firmware/nexus-xr/rotorflight_4.6.0_STM32F7X2_OSD_msp-uart.elf",
+ "board_config":"boards/nexus-xr/NEXUS_XR.config",
+ "profile":"models/rs7/qemu-profile.txt",
+ "aircraft":"models/rs7/aircraft.json",
+ "wiring":[{"device":"icm42688p","slot":"gyro1"},{"device":"dps310","slot":"i2c3"},{"device":"crsf","slot":"uart5"},
+           {"device":"esc","slot":"motor1","telemetry":"bidir"},{"device":"servo","slot":"servo1","actuator":"swash_a"},
+           {"device":"servo","slot":"servo2","actuator":"swash_b"},{"device":"servo","slot":"servo3","actuator":"swash_c"},
+           {"device":"servo","slot":"servo4","actuator":"tail"},
+           {"device":"msp_osd","slot":"uart4"}],
+ "time":{"icount_shift":2,"realtime":false,"idle_skip":true},
+ "ports":{"control":31250,"msp":31235}}

@@ -1,0 +1,3 @@
+{"board":"nexus-xr","firmware":"~/flightbench-spike/fw-msp/obj/main/rotorflight_STM32F7X2_OSD.elf",
+ "board_config":"core/qemu/tests/benches/sparse.config",
+ "wiring":[{"device":"icm42688p","slot":"gyro1"}]}

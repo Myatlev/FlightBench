@@ -1,0 +1,6 @@
+{"name": "ground-takeoff",
+ "description": "The model on a flat runway at the pad, level, free to roll (the wheels roll forward only: no sideways or backward rolling, rolling friction 0.3 1/s, nose held level below 5 m/s). Throttle up and it rolls; it leaves the ground once lift exceeds weight (about 11 m/s at zero pitch with the Skywalker coefficients).",
+ "steps": [
+  {"at_s": 0, "action": "pad"},
+  {"at_s": 0.5, "action": "mark", "event": "ready", "label": "on the runway"}
+ ]}

@@ -1,0 +1,75 @@
+diff --git a/chardev/char-fe.c b/chardev/char-fe.c
+index a44f267..b4a304d 100644
+--- a/chardev/char-fe.c
++++ b/chardev/char-fe.c
+@@ -157,7 +157,9 @@ void qemu_chr_fe_accept_input(CharFrontend *c)
+     if (CHARDEV_GET_CLASS(s)->chr_accept_input) {
+         CHARDEV_GET_CLASS(s)->chr_accept_input(s);
+     }
+-    qemu_notify_event();
++    if (!qemu_chr_has_feature(s, QEMU_CHAR_FEATURE_INPUT_PUSHED)) {
++        qemu_notify_event();
++    }
+ }
+ 
+ void qemu_chr_fe_printf(CharFrontend *c, const char *fmt, ...)
+diff --git a/hw/char/stm32f2xx_usart.c b/hw/char/stm32f2xx_usart.c
+index 2bf0161..25783dd 100644
+--- a/hw/char/stm32f2xx_usart.c
++++ b/hw/char/stm32f2xx_usart.c
+@@ -98,12 +98,15 @@ static uint64_t stm32f2xx_usart_read(void *opaque, hwaddr addr,
+     switch (addr) {
+     case USART_SR:
+         retvalue = s->usart_sr;
+-        qemu_chr_fe_accept_input(&s->chr);
+         break;
+     case USART_DR:
+         retvalue = s->usart_dr & 0x3FF;
+-        s->usart_sr &= ~USART_SR_RXNE;
+-        qemu_chr_fe_accept_input(&s->chr);
++        /* can_receive only changes when RXNE clears: tell the chardev then, not on
++         * every poll (each accept_input wakes the main loop) */
++        if (s->usart_sr & USART_SR_RXNE) {
++            s->usart_sr &= ~USART_SR_RXNE;
++            qemu_chr_fe_accept_input(&s->chr);
++        }
+         stm32f2xx_update_irq(s);
+         break;
+     case USART_BRR:
+@@ -143,7 +146,8 @@ static void stm32f2xx_usart_write(void *opaque, hwaddr addr,
+     trace_stm32f2xx_usart_write(d->id, size, addr, val64);
+ 
+     switch (addr) {
+-    case USART_SR:
++    case USART_SR: {
++        bool rxne = s->usart_sr & USART_SR_RXNE;
+         if (value <= 0x3FF) {
+             /* I/O being synchronous, TXE is always set. In addition, it may
+                only be set by hardware, so keep it set here. */
+@@ -151,8 +155,12 @@ static void stm32f2xx_usart_write(void *opaque, hwaddr addr,
+         } else {
+             s->usart_sr &= value;
+         }
++        if (rxne && !(s->usart_sr & USART_SR_RXNE)) {
++            qemu_chr_fe_accept_input(&s->chr);    /* RXNE cleared by software */
++        }
+         stm32f2xx_update_irq(s);
+         return;
++    }
+     case USART_DR:
+         if (value < 0xF000) {
+             ch = value;
+diff --git a/include/chardev/char.h b/include/chardev/char.h
+index 7377d8e..2a6a10e 100644
+--- a/include/chardev/char.h
++++ b/include/chardev/char.h
+@@ -50,6 +50,9 @@ typedef enum {
+     /* Whether the gcontext can be changed after calling
+      * qemu_chr_be_update_read_handlers() */
+     QEMU_CHAR_FEATURE_GCONTEXT,
++    /* The backend pushes its input itself (no main-loop watch waits for room in
++     * the frontend), so qemu_chr_fe_accept_input() needs no main-loop wake-up */
++    QEMU_CHAR_FEATURE_INPUT_PUSHED,
+ 
+     QEMU_CHAR_FEATURE_LAST,
+ } ChardevFeature;

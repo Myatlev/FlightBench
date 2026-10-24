@@ -1,0 +1,21 @@
+# build outputs
+# editors
+.serena/
+# godot
+*.elf
+*.o
+*.swp
+.idea/
+.vs/
+/app/.godot/
+/app/.mono/
+/app/bin/
+/app/obj/
+/bench/**/*.log
+/boards/*/custom_defaults.bin
+/devices/build/
+/fdm/build/
+/core/qemu/tests/build/
+app/.godot/
+__pycache__/
+/dist/

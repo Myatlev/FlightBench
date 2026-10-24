@@ -1,0 +1,5 @@
+* text=auto eol=lf
+*.ps1 text eol=crlf
+# firmware images as released (Intel HEX carries CRLF; its sha256 is in firmware/FIRMWARE.md)
+*.hex -text
+*.elf binary

@@ -1,0 +1,41 @@
+{
+ "id": "nexus-xr",
+ "name": "RadioMaster Nexus-XR",
+ "machine": "nexus-xr",
+ "mcu": "STM32F722",
+ "msp_uart": "uart1",
+ "config": "NEXUS_XR.config",
+ "firmware_family": "rotorflight",
+ "sources": [
+  "firmware ids, pins, timers, DMA: NEXUS_XR.config (core/qemu/scripts/wiring.py derives them)",
+  "labels: RadioMaster product page spec 'S.BUS[UART1], TELEM[UART2], PORT-A[UART4], PORT-B[UART6], PORT-C[UART3]', 'S1, S2, S3, TAIL Servos', 'Rpm Sensor: 1', 'AUX: 1', 'A-B-C Serial Port Power Output: 5V @1.5A'; https://radiomasterrc.com/products/nexus-xr-control-system",
+  "TAIL = SERVO 4 (A15): Rotorflight wiki (Nexus) 'TAIL can be remapped to Motor 2' and the config's '##resource MOTOR 2 A15'",
+  "configurator names (rotorflight/configurator src/js/tabs/configuration.js, table portNamesRF2 keyed by board_design; this config is F7C5): 161-169 F7C5 = 0 S.BUS, 1 TELEM, 2 Port Ⓒ (UART3), 3 Port Ⓐ (UART4), 4 Int.Rx (UART5), 5 Port Ⓑ (UART6); line 29 uartNames 20 = USB VCP (the Ports tab hides the VCP row, line 456). PORT-A/B/C here keep the product-page spelling of the configurator Port Ⓐ/Ⓑ/Ⓒ",
+  "S1/S2/S3: product-page spec above and rotorflight/firmware src/main/target/NEXUS_XR_OSD/target.c:16-18 (TIM3 CH1 PB4 S1, CH2 PB5 S2, CH3 PB0 S3). motor1 (A09), i2c3, flash1: no printed name in the configurator, the firmware or the product page, left null",
+  "onboard parts: product page (ICM42688P, SPL06-001 barometer, W25N02KV 256 MB flash, built-in ExpressLRS receiver); UART5 = the built-in ELRS receiver (serial 4 64 = RX_SERIAL, used on the real RS7)"
+ ],
+ "pads": [
+  {"id": "uart1", "label": "S.BUS"},
+  {"id": "uart2", "label": "TELEM"},
+  {"id": "uart3", "label": "PORT-C", "flags": ["5v"]},
+  {"id": "uart4", "label": "PORT-A", "flags": ["5v"]},
+  {"id": "uart6", "label": "PORT-B", "flags": ["5v"]},
+  {"id": "uart5", "label": "Int.Rx"},
+  {"id": "motor1", "label": "S5", "note": "the fifth servo-style 3-pin output; firmware resource MOTOR 1 (A09) drives the ESC here (board owner, 2026-09-26)"},
+  {"id": "servo1", "label": "S1"},
+  {"id": "servo2", "label": "S2"},
+  {"id": "servo3", "label": "S3"},
+  {"id": "servo4", "label": "TAIL"},
+  {"id": "freq1", "label": "RPM"},
+  {"id": "usb", "label": "USB VCP", "kind": "uart", "flags": ["usb"], "note": "USB VCP (MSP/CLI on the real board); not emulated, MSP goes over USART1"}
+ ],
+ "onboard": [
+  {"pad": "gyro1", "device": "icm42688p", "detachable": true, "part": "ICM-42688-P"},
+  {"pad": "i2c3", "device": "dps310", "detachable": true, "part": "SPL06-001 (DPS310-compatible)", "note": "soldered on the real board; detachable here so a bench can run without a working baro (the firmware then reports none)"},
+  {"pad": "uart5", "device": "crsf", "detachable": true, "part": "ExpressLRS 2.4 GHz receiver (CRSF)"},
+  {"pad": "flash1", "device": "spiflash", "detachable": false, "part": "W25N02KV 256 MB"}
+ ],
+ "unmapped": [
+  {"label": "AUX", "note": "spec lists 'AUX: 1'; which firmware resource/pin it is is not known here: not in the configurator port table (F7C5) nor named in NEXUS_XR.config or the NEXUS_XR_OSD target; unassigned candidates without a source: timer B01 (TIM3 CH4, no resource), PINIO 1 C08"}
+ ]
+}

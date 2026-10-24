@@ -1,0 +1,134 @@
+set model_preview_type = 14
+set platform_type = AIRPLANE
+set applied_defaults = 3
+set looptime = 1000
+set gyro_main_lpf_hz = 25
+set dynamic_gyro_notch_enabled = ON
+set dynamic_gyro_notch_q = 250
+set dynamic_gyro_notch_min_hz = 30
+set motor_pwm_protocol = STANDARD
+set ahrs_inertia_comp_method = ADAPTIVE
+set nav_fw_bank_angle = 35
+set nav_fw_alt_control_response = 45
+set airmode_type = STICK_CENTER_ONCE
+set small_angle = 180
+set nav_fw_control_smoothness = 2
+set nav_rth_allow_landing = FS_ONLY
+set nav_rth_altitude = 5000
+set nav_wp_radius = 800
+set nav_wp_max_safe_distance = 500
+set nav_fw_launch_max_angle = 45
+set nav_fw_launch_motor_delay = 100
+set nav_fw_launch_max_altitude = 5000
+control_profile 1
+set dterm_lpf_hz = 10
+set d_boost_min = 1.000
+set d_boost_max = 1.000
+set rc_expo = 30
+set rc_yaw_expo = 30
+set roll_rate = 18
+set pitch_rate = 9
+set yaw_rate = 3
+set nav_fw_pos_xy_p = 55
+set fw_turn_assist_pitch_gain = 0.400
+set max_angle_inclination_rll = 450
+set fw_p_pitch = 15
+set fw_i_pitch = 5
+set fw_d_pitch = 5
+set fw_ff_pitch = 80
+set fw_p_roll = 15
+set fw_i_roll = 3
+set fw_d_roll = 7
+set fw_ff_roll = 50
+set fw_p_yaw = 50
+set fw_i_yaw = 0
+set fw_d_yaw = 20
+set fw_ff_yaw = 255
+set nav_fw_pos_z_p = 22
+set nav_fw_pos_z_i = 6
+set nav_fw_pos_z_d = 2
+set tpa_rate = 80
+control_profile 2
+set dterm_lpf_hz = 10
+set d_boost_min = 1.000
+set d_boost_max = 1.000
+set rc_expo = 30
+set rc_yaw_expo = 30
+set roll_rate = 18
+set pitch_rate = 9
+set yaw_rate = 3
+set nav_fw_pos_xy_p = 55
+set fw_turn_assist_pitch_gain = 0.400
+set max_angle_inclination_rll = 450
+set fw_p_pitch = 15
+set fw_i_pitch = 5
+set fw_d_pitch = 5
+set fw_ff_pitch = 80
+set fw_p_roll = 15
+set fw_i_roll = 3
+set fw_d_roll = 7
+set fw_ff_roll = 50
+set fw_p_yaw = 50
+set fw_i_yaw = 0
+set fw_d_yaw = 20
+set fw_ff_yaw = 255
+set nav_fw_pos_z_p = 22
+set nav_fw_pos_z_i = 6
+set nav_fw_pos_z_d = 2
+set tpa_rate = 80
+control_profile 3
+set dterm_lpf_hz = 10
+set d_boost_min = 1.000
+set d_boost_max = 1.000
+set rc_expo = 30
+set rc_yaw_expo = 30
+set roll_rate = 18
+set pitch_rate = 9
+set yaw_rate = 3
+set nav_fw_pos_xy_p = 55
+set fw_turn_assist_pitch_gain = 0.400
+set max_angle_inclination_rll = 450
+set fw_p_pitch = 15
+set fw_i_pitch = 5
+set fw_d_pitch = 5
+set fw_ff_pitch = 80
+set fw_p_roll = 15
+set fw_i_roll = 3
+set fw_d_roll = 7
+set fw_ff_roll = 50
+set fw_p_yaw = 50
+set fw_i_yaw = 0
+set fw_d_yaw = 20
+set fw_ff_yaw = 255
+set nav_fw_pos_z_p = 22
+set nav_fw_pos_z_i = 6
+set nav_fw_pos_z_d = 2
+set tpa_rate = 80
+control_profile 1
+battery_profile 1
+set throttle_idle = 5.000
+battery_profile 2
+set throttle_idle = 5.000
+battery_profile 3
+set throttle_idle = 5.000
+battery_profile 1
+set has_flaps = ON
+set motorstop_on_low = ON
+mmix reset
+mmix 0 1.0 0.0 0.0 0.0
+smix reset
+smix 0 1 0 100 0 -1
+smix 1 2 0 100 0 -1
+smix 2 3 1 100 0 -1
+smix 3 4 2 100 0 -1
+servo 2 1000 2000 1500 -100
+servo 3 1000 2000 1500 -100
+servo 4 1000 2000 1500 -100
+feature PWM_OUTPUT_ENABLE
+aux 0 0 0 1700 2100
+aux 1 1 1 1700 2100
+aux 2 36 2 1700 2100
+feature GPS
+serial 2 +1
+set gps_provider = UBLOX
+set gps_ublox_nav_hz = 10

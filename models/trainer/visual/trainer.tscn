@@ -1,0 +1,47 @@
+[gd_scene format=3]
+
+; Trainer visual rig (placeholder): named pivots only; meshes are built in code by TrainerVisual.cs (visual_class).
+; Frame: Godot body axes (x right, y up, z back, nose towards -z), origin at the CG; the FDM's ground contact
+; is cg_height below it. Surface pivots sit on their hinge lines and carry the actuator names of
+; models/trainer/aircraft.json: aileron_l / aileron_r (hinge along x at the wing's rear spar, the surface
+; runs back to the trailing edge), elevator (hinge along x at the stabiliser's trailing edge), rudder (hinge
+; along y at the fin's trailing edge); prop = the propeller hub (spins about z), motor = the motor can.
+; Sign convention (state.plane.surfaces_deg): + = aileron trailing edge down, elevator trailing edge up,
+; rudder trailing edge right. view_size = the model's size in metres (span): the cameras scale by it.
+
+[node name="trainer" type="Node3D"]
+metadata/visual_class = "FlightBench.Models.TrainerVisual"
+metadata/cg_height = 0.1
+metadata/view_size = 1.88
+
+[node name="body" type="Node3D" parent="."]
+
+[node name="aileron_l" type="Node3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.64, 0.07, 0.08)
+metadata/span = 0.56
+metadata/chord = 0.06
+
+[node name="aileron_r" type="Node3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.64, 0.07, 0.08)
+metadata/span = 0.56
+metadata/chord = 0.06
+
+[node name="elevator" type="Node3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.02, 0.64)
+metadata/span = 0.52
+metadata/chord = 0.06
+
+[node name="rudder" type="Node3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.14, 0.64)
+metadata/height = 0.17
+metadata/chord = 0.06
+
+[node name="motor" type="Node3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -0.47)
+
+[node name="prop" type="Node3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -0.52)
+metadata/radius = 0.14
+
+[node name="fpv" type="Node3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.07, -0.42)

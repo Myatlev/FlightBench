@@ -1,0 +1,2 @@
+default.mcm: copied unmodified from the Rotorflight Configurator, resources/osd/2/default.mcm (its default OSD font, font version 2; a fork checkout at commit c8dd72f), licensed GPL-3.0 as part of that project.
+inav-default.mcm: copied unmodified from the INAV Configurator 9.1.1, resources/osd/analogue/default.mcm (its analogue OSD font, 512 characters; sha256 89e4643b168e3205a482d7ac2faaef0dfe0fa08ca0fd0c449b017be3d383d50b), licensed GPL-3.0 as part of that project. Provenance of both fonts: FONTS.md.

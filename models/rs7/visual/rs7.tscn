@@ -1,0 +1,53 @@
+[gd_scene format=3]
+
+; RS7 visual rig: named pivots only; meshes are built in code by Rs7Visual.cs (visual_class).
+; Frame: Godot body axes (x right, y up, z back, nose towards -z), origin at the CG, skids at y = -cg_height.
+; Actuator nodes carry the model's actuator names (models/rs7/README.md): swash_a / swash_b / swash_c =
+; the output shaft centres of the servos, 120 deg CCPM named as RotorFlight's SWASH_TYPE_120 (servo 1 =
+; swash_a = single pitch servo on the centre line at the rear, 180 deg; swash_b left-front -60 deg,
+; swash_c right-front +60 deg, mirrored); metadata/horn = horn direction at neutral (tip under the plate
+; ball, pushrod vertical), metadata/case = which way along the output shaft the case sits,
+; tail = the bell crank pivot at the tail case, tail_servo = the tail servo's output shaft at the boom root,
+; motor = motor can.
+
+[node name="rs7" type="Node3D"]
+metadata/visual_class = "FlightBench.Models.Rs7Visual"
+metadata/cg_height = 0.2
+
+[node name="body" type="Node3D" parent="."]
+
+[node name="rotor" type="Node3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.22, 0)
+
+[node name="swashplate" type="Node3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.12, 0)
+
+[node name="swash_a" type="Node3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.03, 0.065)
+metadata/horn = Vector3(0, 0, -1)
+metadata/case = Vector3(1, 0, 0)
+
+[node name="swash_b" type="Node3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.0563, 0.03, -0.0325)
+metadata/horn = Vector3(0.866, 0, 0.5)
+metadata/case = Vector3(-0.5, 0, 0.866)
+
+[node name="swash_c" type="Node3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.0563, 0.03, -0.0325)
+metadata/horn = Vector3(-0.866, 0, 0.5)
+metadata/case = Vector3(0.5, 0, 0.866)
+
+[node name="motor" type="Node3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.005, -0.068)
+
+[node name="tail_rotor" type="Node3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.04, 0.05, 1.25)
+
+[node name="tail" type="Node3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.012, 0.022, 1.19)
+
+[node name="tail_servo" type="Node3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.03, 0.005, 0.095)
+
+[node name="fpv" type="Node3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.0, -0.3)

@@ -1,0 +1,43 @@
+# version
+batch start
+defaults noreboot
+set a = 1.000
+set b = 2.5
+set c = x
+set d = 4
+feature GPS
+feature TELEMETRY
+serial 2 2 115200 115200 0 115200
+serial 4 1 115200 115200 0 115200
+serial 5 5 115200 57600 0 115200
+aux 0 0 0 1700 2100
+aux 2 36 2 1700 2100
+control_profile 2
+set roll_rate = 20
+control_profile 3
+set roll_rate = 31
+mixer_profile 2
+smix reset
+smix 1 2 0 100 0 -1
+mixer_profile 1
+mmix reset
+mmix 0  1.000  0.000  0.000  0.000
+map TAER1234
+resource MOTOR 1 b06
+some_command x y
+set e = ON
+set f = 16
+set g = 1000
+set h = inf
+blackbox NAV_ACC
+control_profile 1
+mixer_profile 1
+save
+serial 5 1 115200 57600 0 115200
+profile 0
+set p_pitch = 50
+rateprofile 0
+set roll_rc_rate = 100
+rateprofile 2
+set roll_rc_rate = 125
+profile 1

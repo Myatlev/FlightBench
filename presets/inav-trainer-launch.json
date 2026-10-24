@@ -1,0 +1,232 @@
+{
+  "name": "Trainer · NAV LAUNCH",
+  "description": "SpeedyBee F405 WING with stock iNav 9.1.0 on a trainer plane (CRSF on uart1, ESC on S1, servos S3..S6 = aileron L/R, elevator, rudder; a GPS module on uart3 + I2C1: u-blox M10 and a QMC5883L compass; a 4S 4200 mAh battery on BAT). First start: the core configures the board and runs iNav's 6-position ACC calibration and its compass calibration (a few minutes, once; Status shows the progress). Then: ANGLE (ch6, key 6) + NAV LAUNCH (ch7, key 7) on, ARM (ch5, key 5) with the throttle low, throttle up (W), Launch (L): held 10 deg nose up, thrown at 50 km/h in 0.5 s.",
+  "board": "speedybee-f405-wing",
+  "firmwarePath": "firmware/speedybee-f405-wing/inav_9.1.0_SPEEDYBEEF405WING.hex",
+  "watchFirmware": false,
+  "aircraft": "trainer",
+  "visual": "models/trainer/visual/trainer.tscn",
+  "switches": [
+    {
+      "channel": 5,
+      "name": "ARM",
+      "note": "high (1700..2100) = armed; arm with the throttle low"
+    },
+    {
+      "channel": 6,
+      "name": "ANGLE",
+      "note": "high = ANGLE (self-level); needed for NAV LAUNCH"
+    },
+    {
+      "channel": 7,
+      "name": "NAV LAUNCH",
+      "note": "high = launch mode; turn it on while disarmed (iNav enters launch mode only from a box switched on before arming)"
+    }
+  ],
+  "switchOrder": "ANGLE + NAV LAUNCH on -> ARM with the throttle low -> throttle up (iNav waits, motor idle) -> Launch",
+  "wiring": [
+    {
+      "device": "crsf",
+      "port": "uart",
+      "pad": "uart1",
+      "links": {},
+      "actuator": "",
+      "reversed": false,
+      "option": "",
+      "props": {}
+    },
+    {
+      "device": "esc",
+      "port": "signal",
+      "pad": "output1",
+      "links": {},
+      "actuator": "motor",
+      "reversed": false,
+      "option": "",
+      "props": {}
+    },
+    {
+      "device": "servo",
+      "port": "pwm",
+      "pad": "output3",
+      "links": {},
+      "actuator": "aileron_l",
+      "reversed": false,
+      "option": "",
+      "props": {}
+    },
+    {
+      "device": "servo",
+      "port": "pwm",
+      "pad": "output4",
+      "links": {},
+      "actuator": "aileron_r",
+      "reversed": false,
+      "option": "",
+      "props": {}
+    },
+    {
+      "device": "servo",
+      "port": "pwm",
+      "pad": "output5",
+      "links": {},
+      "actuator": "elevator",
+      "reversed": false,
+      "option": "",
+      "props": {}
+    },
+    {
+      "device": "servo",
+      "port": "pwm",
+      "pad": "output6",
+      "links": {},
+      "actuator": "rudder",
+      "reversed": false,
+      "option": "",
+      "props": {}
+    },
+    {
+      "device": "icm42688p",
+      "port": "spi",
+      "pad": "gyro1",
+      "links": {},
+      "actuator": "",
+      "reversed": false,
+      "option": "",
+      "props": {
+        "accel_offset_mg": 20,
+        "accel_scale_pct": 0.5
+      }
+    },
+    {
+      "device": "max7456",
+      "port": "spi",
+      "pad": "osd1",
+      "links": {},
+      "actuator": "",
+      "reversed": false,
+      "option": "",
+      "props": {}
+    },
+    {
+      "device": "ublox",
+      "port": "uart",
+      "pad": "uart3",
+      "links": {},
+      "actuator": "",
+      "reversed": false,
+      "option": "",
+      "props": {}
+    },
+    {
+      "device": "qmc5883l",
+      "port": "i2c",
+      "pad": "i2c1",
+      "links": {},
+      "actuator": "",
+      "reversed": false,
+      "option": "",
+      "props": {}
+    },
+    {
+      "device": "battery",
+      "port": "power",
+      "pad": "batt1",
+      "links": {},
+      "actuator": "",
+      "reversed": false,
+      "option": "",
+      "props": {}
+    }
+  ],
+  "detached": [],
+  "wiringLayout": {},
+  "boardConfig": "",
+  "boardConfigFile": "",
+  "profileFile": "",
+  "time": {
+    "icountShift": 2,
+    "idleSkip": true,
+    "realtime": true
+  },
+  "core": "local",
+  "coreHost": "127.0.0.1",
+  "corePort": 31250,
+  "mspPort": 31235,
+  "layout": {
+    "Status": {
+      "open": true,
+      "x": 20,
+      "y": 70,
+      "w": 380,
+      "h": 150
+    },
+    "Aircraft": {
+      "open": true,
+      "x": 20,
+      "y": 270,
+      "w": 380,
+      "h": 300
+    },
+    "Transmitter": {
+      "open": true,
+      "x": 1220,
+      "y": 390,
+      "w": 360,
+      "h": 470
+    },
+    "Log / CLI": {
+      "open": true,
+      "x": 420,
+      "y": 70,
+      "w": 700,
+      "h": 280
+    },
+    "Firmware": {
+      "open": false,
+      "x": 400,
+      "y": 370,
+      "w": 600,
+      "h": 160
+    },
+    "Signals": {
+      "open": false,
+      "x": 400,
+      "y": 370,
+      "w": 900,
+      "h": 420
+    },
+    "Wiring": {
+      "open": false,
+      "x": 860,
+      "y": 330,
+      "w": 700,
+      "h": 540
+    },
+    "Model": {
+      "open": true,
+      "x": 1240,
+      "y": 70,
+      "w": 340,
+      "h": 280
+    },
+    "Faults": {
+      "open": false,
+      "x": 1180,
+      "y": 360,
+      "w": 420,
+      "h": 460
+    },
+    "OSD": {
+      "open": false,
+      "x": 420,
+      "y": 380,
+      "w": 560,
+      "h": 320
+    }
+  },
+  "signals": [],
+  "camera": "chase",
+  "bodyAxes": false,
+  "osdOverlay": false
+}

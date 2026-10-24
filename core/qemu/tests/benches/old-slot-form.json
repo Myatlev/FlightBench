@@ -1,0 +1,12 @@
+{"board":"nexus-xr","firmware":"~/flightbench-spike/fw-msp/obj/main/rotorflight_STM32F7X2_OSD.elf",
+ "board_config":"boards/nexus-xr/NEXUS_XR.config",
+ "profile":"models/rs7/qemu-profile.txt",
+ "aircraft":"C:/Users/you/flightbench/models/rs7/aircraft.json",
+ "wiring":[{"device":"icm42688p","slot":"gyro1","actuator":"","reversed":false,"option":""},
+           {"device":"crsf","slot":"uart3","actuator":"","reversed":false,"option":""},
+           {"device":"servo","slot":"servo1","actuator":"swash_a","reversed":false,"option":""},
+           {"device":"servo","slot":"servo4","actuator":"tail","reversed":true,"option":""},
+           {"device":"msp_osd","slot":"uart6","actuator":"","reversed":false,"option":""},
+           {"device":"gps","slot":"uart6","actuator":"","reversed":false,"option":""}],
+ "time":{"icount_shift":2,"realtime":false,"idle_skip":true},
+ "ports":{"control":31250,"msp":31235}}

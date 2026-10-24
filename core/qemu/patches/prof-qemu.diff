@@ -1,0 +1,266 @@
+diff --git a/accel/tcg/tcg-accel-ops-icount.c b/accel/tcg/tcg-accel-ops-icount.c
+index d0f7b41..abaf390 100644
+--- a/accel/tcg/tcg-accel-ops-icount.c
++++ b/accel/tcg/tcg-accel-ops-icount.c
+@@ -68,8 +68,12 @@ static int64_t icount_get_limit(void)
+ 
+ static void icount_notify_aio_contexts(void)
+ {
+-    /* Wake up other AioContexts.  */
+-    qemu_clock_notify(QEMU_CLOCK_VIRTUAL);
++    /* Wake up other AioContexts (only those with virtual timers; replay: all).  */
++    if (replay_mode == REPLAY_MODE_NONE) {
++        qemu_clock_notify_nonempty(QEMU_CLOCK_VIRTUAL);
++    } else {
++        qemu_clock_notify(QEMU_CLOCK_VIRTUAL);
++    }
+     qemu_clock_run_timers(QEMU_CLOCK_VIRTUAL);
+ }
+ 
+diff --git a/accel/tcg/tcg-accel-ops-rr.c b/accel/tcg/tcg-accel-ops-rr.c
+index cdaa3e1..4585466 100644
+--- a/accel/tcg/tcg-accel-ops-rr.c
++++ b/accel/tcg/tcg-accel-ops-rr.c
+@@ -29,6 +29,7 @@
+ #include "system/replay.h"
+ #include "exec/icount.h"
+ #include "qemu/main-loop.h"
++#include "qemu/prof-hooks.h"
+ #include "qemu/notify.h"
+ #include "qemu/guest-random.h"
+ #include "exec/cpu-common.h"
+@@ -112,7 +113,9 @@ static void rr_wait_io_event(void)
+ 
+     while (all_cpu_threads_idle()) {
+         rr_stop_kick_timer();
++        QEMU_PROF_HOOK(vcpu_wait, true);
+         qemu_cond_wait_bql(first_cpu->halt_cond);
++        QEMU_PROF_HOOK(vcpu_wait, false);
+     }
+ 
+     rr_start_kick_timer();
+@@ -283,10 +286,13 @@ static void *rr_cpu_thread_fn(void *arg)
+                 if (icount_enabled()) {
+                     icount_prepare_for_run(cpu, cpu_budget);
+                 }
++                QEMU_PROF_HOOK(slice_start, cpu);
+                 r = tcg_cpu_exec(cpu);
++                int64_t prof_left = cpu->neg.icount_decr.u16.low + cpu->icount_extra;
+                 if (icount_enabled()) {
+                     icount_process_data(cpu);
+                 }
++                QEMU_PROF_HOOK(slice_end, cpu, r, prof_left);
+                 bql_lock();
+ 
+                 if (r == EXCP_DEBUG) {
+diff --git a/include/qemu/prof-hooks.h b/include/qemu/prof-hooks.h
+new file mode 100644
+index 0000000..b61777c
+--- /dev/null
++++ b/include/qemu/prof-hooks.h
+@@ -0,0 +1,44 @@
++/*
++ * Host-time profiling hooks (FlightBench core/qemu/patches/prof-qemu.diff).
++ *
++ * A machine that wants to see where host time goes installs a table of callbacks here; with no
++ * table installed (the default) every hook site costs one load and one untaken branch. The hooks
++ * only observe: none of them may change what the vCPU executes or when.
++ *
++ * SPDX-License-Identifier: GPL-2.0-or-later
++ */
++#ifndef QEMU_PROF_HOOKS_H
++#define QEMU_PROF_HOOKS_H
++
++#include "qemu/atomic.h"
++
++typedef struct QemuProfHooks {
++    /* vCPU thread (single-threaded TCG round robin), around tcg_cpu_exec(); BQL not held */
++    void (*slice_start)(CPUState *cpu);
++    /* after icount_process_data(); left = instructions of the budget not executed */
++    void (*slice_end)(CPUState *cpu, int ret, int64_t left);
++    /* the vCPU thread sleeps on halt_cond (all vCPUs idle) / wakes up; BQL released inside */
++    void (*vcpu_wait)(bool begin);
++    /* qemu_cpu_kick(): self = called on the vCPU's own thread (cpu_exit from inside) */
++    void (*kick)(CPUState *cpu, bool self);
++    /* qemu_timer_notify_cb() on the vCPU thread: a virtual timer was armed earlier than the
++     * running budget, the vCPU leaves cpu_exec to recompute it */
++    void (*timer_exit)(void);
++    /* aio_notify() wrote the event notifier (a thread in poll must wake up) */
++    void (*notify)(void);
++    /* main loop: around qemu_poll_ns() in os_host_main_loop_wait(); BQL not held */
++    void (*poll)(bool begin, unsigned nfds);
++    /* bql_lock() found the BQL taken: begin before blocking, end once it is held */
++    void (*bql_wait)(bool begin);
++} QemuProfHooks;
++
++extern const QemuProfHooks *qemu_prof_hooks;
++
++#define QEMU_PROF_HOOK(fn, ...) do {                                    \
++        const QemuProfHooks *h_ = qatomic_read(&qemu_prof_hooks);       \
++        if (unlikely(h_ != NULL) && h_->fn) {                           \
++            h_->fn(__VA_ARGS__);                                        \
++        }                                                               \
++    } while (0)
++
++#endif
+diff --git a/include/qemu/timer.h b/include/qemu/timer.h
+index 9a62ac8..4946295 100644
+--- a/include/qemu/timer.h
++++ b/include/qemu/timer.h
+@@ -200,6 +200,18 @@ int64_t qemu_clock_deadline_ns_all(QEMUClockType type, int attr_mask);
+  */
+ void qemu_clock_notify(QEMUClockType type);
+ 
++/**
++ * qemu_clock_notify_nonempty:
++ * @type: the clock type
++ *
++ * Like qemu_clock_notify(), but skips the timer lists other than the
++ * main loop's that have no timer (FlightBench, patches/prof-qemu.diff):
++ * under icount the vCPU thread runs the main loop's virtual timers itself,
++ * so waking an AioContext with an empty virtual list only costs a poll
++ * wake-up and a BQL hand-off.
++ */
++void qemu_clock_notify_nonempty(QEMUClockType type);
++
+ /**
+  * qemu_clock_enable:
+  * @type: the clock type
+diff --git a/system/cpu-timers.c b/system/cpu-timers.c
+index 9919b46..0de760e 100644
+--- a/system/cpu-timers.c
++++ b/system/cpu-timers.c
+@@ -29,6 +29,7 @@
+ #include "qemu/error-report.h"
+ #include "system/cpus.h"
+ #include "qemu/main-loop.h"
++#include "qemu/prof-hooks.h"
+ #include "qemu/option.h"
+ #include "qemu/seqlock.h"
+ #include "system/replay.h"
+@@ -250,6 +251,7 @@ void qemu_timer_notify_cb(void *opaque, QEMUClockType type)
+          * tcg_cpu_exec() loop so it will recalculate its
+          * icount deadline immediately.
+          */
++        QEMU_PROF_HOOK(timer_exit);
+         cpu_exit(current_cpu);
+     } else if (first_cpu) {
+         /*
+diff --git a/system/cpus.c b/system/cpus.c
+index 97e5a5e..87080b7 100644
+--- a/system/cpus.c
++++ b/system/cpus.c
+@@ -36,6 +36,7 @@
+ #include "exec/cpu-common.h"
+ #include "qemu/thread.h"
+ #include "qemu/main-loop.h"
++#include "qemu/prof-hooks.h"
+ #include "qemu/plugin.h"
+ #include "system/cpus.h"
+ #include "qemu/guest-random.h"
+@@ -500,6 +501,7 @@ void cpus_kick_thread(CPUState *cpu)
+ 
+ void qemu_cpu_kick(CPUState *cpu)
+ {
++    QEMU_PROF_HOOK(kick, cpu, qemu_cpu_is_self(cpu));
+     qemu_cond_broadcast(cpu->halt_cond);
+     if (cpus_accel->kick_vcpu_thread) {
+         cpus_accel->kick_vcpu_thread(cpu);
+@@ -577,6 +579,16 @@ void bql_lock_impl(const char *file, int line)
+     QemuMutexLockFunc bql_lock_fn = qatomic_read(&bql_mutex_lock_func);
+ 
+     g_assert(!bql_locked());
++    if (unlikely(qatomic_read(&qemu_prof_hooks) != NULL) &&
++        bql_lock_fn == qemu_mutex_lock_impl) {
++        if (qemu_mutex_trylock_impl(&bql, file, line) == 0) {
++            return;
++        }
++        QEMU_PROF_HOOK(bql_wait, true);
++        bql_lock_fn(&bql, file, line);
++        QEMU_PROF_HOOK(bql_wait, false);
++        return;
++    }
+     bql_lock_fn(&bql, file, line);
+ }
+ 
+diff --git a/util/async.c b/util/async.c
+index 741fcfd..04a5bff 100644
+--- a/util/async.c
++++ b/util/async.c
+@@ -29,6 +29,7 @@
+ #include "block/thread-pool.h"
+ #include "block/graph-lock.h"
+ #include "qemu/main-loop.h"
++#include "qemu/prof-hooks.h"
+ #include "qemu/mem-reentrancy.h"
+ #include "qemu/atomic.h"
+ #include "qemu/lockcnt.h"
+@@ -477,10 +478,13 @@ void aio_notify(AioContext *ctx)
+      */
+     smp_mb();
+     if (qatomic_read(&ctx->notify_me)) {
++        QEMU_PROF_HOOK(notify);
+         event_notifier_set(&ctx->notifier);
+     }
+ }
+ 
++const QemuProfHooks *qemu_prof_hooks;
++
+ void aio_notify_accept(AioContext *ctx)
+ {
+     qatomic_set(&ctx->notified, false);
+diff --git a/util/main-loop.c b/util/main-loop.c
+index 65e5dbc..abd388c 100644
+--- a/util/main-loop.c
++++ b/util/main-loop.c
+@@ -30,6 +30,7 @@
+ #include "exec/icount.h"
+ #include "system/replay.h"
+ #include "qemu/main-loop.h"
++#include "qemu/prof-hooks.h"
+ #include "qemu/aio.h"
+ #include "block/thread-pool.h"
+ #include "qemu/error-report.h"
+@@ -307,7 +308,9 @@ static int os_host_main_loop_wait(int64_t timeout)
+     bql_unlock();
+     replay_mutex_unlock();
+ 
++    QEMU_PROF_HOOK(poll, true, gpollfds->len);
+     ret = qemu_poll_ns((GPollFD *)gpollfds->data, gpollfds->len, timeout);
++    QEMU_PROF_HOOK(poll, false, gpollfds->len);
+ 
+     replay_mutex_lock();
+     bql_lock();
+@@ -523,7 +526,9 @@ static int os_host_main_loop_wait(int64_t timeout)
+ 
+     replay_mutex_unlock();
+ 
++    QEMU_PROF_HOOK(poll, true, n_poll_fds + w->num);
+     g_poll_ret = qemu_poll_ns(poll_fds, n_poll_fds + w->num, poll_timeout_ns);
++    QEMU_PROF_HOOK(poll, false, n_poll_fds + w->num);
+ 
+     replay_mutex_lock();
+ 
+diff --git a/util/qemu-timer.c b/util/qemu-timer.c
+index d93a020..9c26bcc 100644
+--- a/util/qemu-timer.c
++++ b/util/qemu-timer.c
+@@ -149,6 +149,18 @@ void qemu_clock_notify(QEMUClockType type)
+     }
+ }
+ 
++void qemu_clock_notify_nonempty(QEMUClockType type)
++{
++    QEMUTimerList *timer_list;
++    QEMUClock *clock = qemu_clock_ptr(type);
++    QLIST_FOREACH(timer_list, &clock->timerlists, list) {
++        /* FlightBench: an AioContext list without timers has nothing to run */
++        if (timer_list == main_loop_tlg.tl[type] || timerlist_has_timers(timer_list)) {
++            timerlist_notify(timer_list);
++        }
++    }
++}
++
+ /* Disabling the clock will wait for related timerlists to stop
+  * executing qemu_run_timers.  Thus, this functions should not
+  * be used from the callback of a timer that is based on @clock.

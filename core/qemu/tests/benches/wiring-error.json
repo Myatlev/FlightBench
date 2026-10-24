@@ -1,0 +1,10 @@
+{"board":"nexus-xr","firmware":"~/flightbench-spike/fw-msp/obj/main/rotorflight_STM32F7X2_OSD.elf",
+ "profile":"models/rs7/qemu-profile.txt",
+ "aircraft":"models/rs7/aircraft.json",
+ "wiring":[{"device":"servo","port":"pwm","pad":"S9","actuator":"tail"},
+           {"device":"spiflash","detached":true},
+           {"device":"servo","port":"pwm","pad":"S1","actuator":"tail"},
+           {"device":"servo","port":"pwm","pad":"TAIL","actuator":"tail"},
+           {"device":"esc","port":"signal","pad":"motor1","telemetry":"pwm"},
+           {"device":"crsf","port":"uart","pad":"TELEM"}],
+ "time":{"icount_shift":2,"realtime":false,"idle_skip":true}}

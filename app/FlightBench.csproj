@@ -1,0 +1,13 @@
+<Project Sdk="Godot.NET.Sdk/4.7.2">
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <EnableDynamicLoading>true</EnableDynamicLoading>
+    <Nullable>enable</Nullable>
+    <LangVersion>latest</LangVersion>
+    <RootNamespace>FlightBench</RootNamespace>
+  </PropertyGroup>
+  <ItemGroup>
+    <!-- aircraft visuals live next to their scenes in the repo (models/<name>/visual/); see scripts/AircraftVisual.cs -->
+    <Compile Include="../models/*/visual/*.cs" />
+  </ItemGroup>
+</Project>

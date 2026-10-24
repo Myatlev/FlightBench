@@ -1,0 +1,23 @@
+{"id": "rs7", "name": "Goosky RS7 Ultra", "class": "700 electric helicopter", "fdm": "heli",
+ "actuators": ["swash_a", "swash_b", "swash_c", "tail", "motor"],
+ "fdm_inputs": ["swash_a", "swash_b", "swash_c", "tail"],
+ "centre_us": {"swash_a": 1500, "swash_b": 1500, "swash_c": 1500, "tail": 1500},
+ "throttle": "motor",
+ "transmission": {"main_rotor_gear_ratio": [13, 116]},
+ "esc": {"kv": 520, "poles": 10, "tau_s": 0.4, "max_current_a": 200, "idle_current_a": 0.5, "voltage_v": 50},
+ "functions": [
+  {"name": "calibrate_acc", "label": "Calibrate accelerometer (level)", "auto_first_start": false, "params": {}},
+  {"name": "calibrate_gyro", "label": "Calibrate gyro (hold still, reboot)", "auto_first_start": false,
+   "params": {"hold_s": 2}}],
+ "fdm_params": {
+  "mass_kg": 5.0,
+  "inertia_kgm2": [0.12, 0.35, 0.30],
+  "rotor": {"radius_m": 0.804, "chord_m": 0.060, "blades": 2, "lift_slope": 5.7, "cd0": 0.011,
+            "tip_loss": 0.97, "kappa": 1.15, "stall_deg": 14, "lock_number": 4.5,
+            "hub_stiffness_nm_per_rad": 120, "hub_height_m": 0.22, "direction": "cw",
+            "nominal_rpm": 1800, "rated_torque_nm": 32},
+  "tail": {"radius_m": 0.1475, "chord_m": 0.030, "blades": 2, "ratio": 5.0, "arm_m": 0.85, "height_m": 0.05,
+           "pitch_max_deg": 12, "power_fraction": 0.08},
+  "swash": {"collective_max_deg": 12, "cyclic_max_deg": 12, "order": ["swash_a", "swash_b", "swash_c"]},
+  "drag_area_m2": [0.045, 0.09, 0.07],
+  "servo": {"swash_travel_us": 500, "tail_travel_us": 270, "delay_ms": 8, "speed_s60": 0.09}}}

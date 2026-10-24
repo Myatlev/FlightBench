@@ -1,0 +1,236 @@
+diff --git a/accel/tcg/internal-common.h b/accel/tcg/internal-common.h
+index 9e7be2d..f679790 100644
+--- a/accel/tcg/internal-common.h
++++ b/accel/tcg/internal-common.h
+@@ -137,6 +137,15 @@ void page_table_config_init(void);
+ G_NORETURN void cpu_io_recompile(CPUState *cpu, uintptr_t retaddr);
+ #endif /* CONFIG_USER_ONLY */
+ 
++/*
++ * icount: guest PCs of instructions that did device I/O in the middle of a TB
++ * (cpu_io_recompile). The translator gives each of them a TB of its own, the
++ * shape the recompile gives it at every execution otherwise.
++ */
++void tb_io_insn_note(vaddr pc);
++bool tb_io_insn_ends_tb(vaddr pc, vaddr next_pc);
++void tb_io_insn_forget_all(void);
++
+ void tb_phys_invalidate(TranslationBlock *tb, tb_page_addr_t page_addr);
+ void tb_set_jmp_target(TranslationBlock *tb, int n, uintptr_t addr);
+ 
+diff --git a/accel/tcg/tb-maint.c b/accel/tcg/tb-maint.c
+index 4313864..4bc251d 100644
+--- a/accel/tcg/tb-maint.c
++++ b/accel/tcg/tb-maint.c
+@@ -784,6 +784,7 @@ void tb_flush__exclusive_or_serial(void)
+ 
+     qht_reset_size(&tb_ctx.htable, CODE_GEN_HTABLE_SIZE);
+     tb_remove_all();
++    tb_io_insn_forget_all();
+ 
+     tcg_region_reset_all();
+     /* XXX: flush processor icache at this point if cache flush is expensive */
+diff --git a/accel/tcg/translate-all.c b/accel/tcg/translate-all.c
+index 328d96a..e2ad45b 100644
+--- a/accel/tcg/translate-all.c
++++ b/accel/tcg/translate-all.c
+@@ -18,6 +18,7 @@
+  */
+ 
+ #include "qemu/osdep.h"
++#include "system/cpu-timers.h"
+ 
+ #include "trace.h"
+ #include "disas/disas.h"
+@@ -572,18 +573,62 @@ void tb_check_watchpoint(CPUState *cpu, uintptr_t retaddr)
+  *
+  * Called by softmmu_template.h, with iothread mutex not held.
+  */
++/*
++ * icount: cpu_io_recompile() runs at every execution of a TB with a device
++ * access in its middle -- in a polling loop, at every pass. Its TB search by
++ * host PC and the unwind-data decode give the same answer each time until the
++ * code buffer is flushed (host code is not reused before that), so both are
++ * memoized per host PC. The restore itself is unchanged. icount runs one vCPU
++ * thread: no locking.
++ */
++typedef struct IoRecompileMemo {
++    uintptr_t retaddr;
++    TranslationBlock *tb;
++    unsigned flush_count;
++    int insns_left;
++    uint64_t data[INSN_START_WORDS];
++} IoRecompileMemo;
++
++static IoRecompileMemo io_recompile_memo[256];
++
++static TranslationBlock *io_recompile_restore(CPUState *cpu, uintptr_t retaddr)
++{
++    IoRecompileMemo *m = &io_recompile_memo[(retaddr >> 2) & 255];
++    unsigned flush_count = qatomic_read(&tb_ctx.tb_flush_count);
++    TranslationBlock *tb;
++
++    if (m->tb && m->retaddr == retaddr && m->flush_count == flush_count) {
++        tb = m->tb;
++    } else {
++        tb = tcg_tb_lookup(retaddr);
++        if (!tb) {
++            cpu_abort(cpu, "cpu_io_recompile: could not find TB for pc=%p",
++                      (void *)retaddr);
++        }
++        if (!(tb_cflags(tb) & CF_USE_ICOUNT)) {
++            cpu_restore_state_from_tb(cpu, tb, retaddr);
++            return tb;
++        }
++        m->insns_left = cpu_unwind_data_from_tb(tb, retaddr, m->data);
++        m->retaddr = retaddr;
++        m->tb = tb;
++        m->flush_count = flush_count;
++    }
++    /* what cpu_restore_state_from_tb() does with the unwind data */
++    if (m->insns_left >= 0) {
++        cpu->neg.icount_decr.u16.low += m->insns_left;
++        cpu->cc->tcg_ops->restore_state_to_opc(cpu, tb, m->data);
++    }
++    return tb;
++}
++
+ void cpu_io_recompile(CPUState *cpu, uintptr_t retaddr)
+ {
+     TranslationBlock *tb;
+     const CPUClass *cc = cpu->cc;
+     uint32_t n;
+ 
+-    tb = tcg_tb_lookup(retaddr);
+-    if (!tb) {
+-        cpu_abort(cpu, "cpu_io_recompile: could not find TB for pc=%p",
+-                  (void *)retaddr);
+-    }
+-    cpu_restore_state_from_tb(cpu, tb, retaddr);
++    tb = io_recompile_restore(cpu, retaddr);
+ 
+     /*
+      * Some guests must re-execute the branch when re-executing a delay
+@@ -597,6 +642,16 @@ void cpu_io_recompile(CPUState *cpu, uintptr_t retaddr)
+         n = 2;
+     }
+ 
++    /*
++     * icount_io_insn_tbs: remember the instruction and drop this TB; its next
++     * translation ends before the instruction, which gets a TB of its own
++     * (tb_io_insn_ends_tb). Not with a delay-slot replay.
++     */
++    if (icount_io_insn_tbs && n == 1 && (tb_cflags(tb) & CF_USE_ICOUNT)) {
++        tb_io_insn_note(cc->get_pc(cpu));
++        tb_phys_invalidate(tb, -1);
++    }
++
+     /*
+      * Exit the loop and potentially generate a new TB executing the
+      * just the I/O insns. We also limit instrumentation to memory
+diff --git a/accel/tcg/translator.c b/accel/tcg/translator.c
+index 57daded..7d70868 100644
+--- a/accel/tcg/translator.c
++++ b/accel/tcg/translator.c
+@@ -8,6 +8,7 @@
+  */
+ 
+ #include "qemu/osdep.h"
++#include "system/cpu-timers.h"
+ #include "qemu/bswap.h"
+ #include "qemu/log.h"
+ #include "qemu/error-report.h"
+@@ -115,10 +116,55 @@ bool translator_use_goto_tb(DisasContextBase *db, vaddr dest)
+         return false;
+     }
+ 
++    /*
++     * icount: no direct jump into a known I/O instruction's TB. The indirect
++     * path stores the PC first, so the instruction sees the guest PC it saw
++     * when cpu_io_recompile() had restored it (see tb_io_insn_note).
++     */
++    if ((tb_cflags(db->tb) & CF_USE_ICOUNT) && tb_io_insn_ends_tb(dest, dest)) {
++        return false;
++    }
++
+     /* Check for the dest on the same page as the start of the TB.  */
+     return translator_is_same_page(db, dest);
+ }
+ 
++/*
++ * icount: an instruction that does device I/O must be the last one of its TB
++ * (can_do_io). Found in the middle of one, cpu_io_recompile() rewinds to it and
++ * runs it as a TB of one instruction, then goes on with a new TB after it -- at
++ * every execution, since the cached TB stays as it was: a host-PC unwind, a TB
++ * lookup and a longjmp per access (a polling loop on a device register pays it
++ * on every pass). Noted here, the instruction gets that one-instruction TB from
++ * the translator instead: the same TB boundaries, hence the same instruction
++ * counts, interrupt checks and guest state at the access, without the
++ * round trip. Used by the vCPU thread only (icount runs one vCPU thread).
++ */
++bool icount_io_insn_tbs;
++static GHashTable *tb_io_insns;
++
++void tb_io_insn_note(vaddr pc)
++{
++    if (!tb_io_insns) {
++        tb_io_insns = g_hash_table_new(g_direct_hash, g_direct_equal);
++    }
++    g_hash_table_add(tb_io_insns, (gpointer)(uintptr_t)pc);
++}
++
++bool tb_io_insn_ends_tb(vaddr pc, vaddr next_pc)
++{
++    return tb_io_insns &&
++           (g_hash_table_contains(tb_io_insns, (gpointer)(uintptr_t)pc) ||
++            g_hash_table_contains(tb_io_insns, (gpointer)(uintptr_t)next_pc));
++}
++
++void tb_io_insn_forget_all(void)
++{
++    if (tb_io_insns) {
++        g_hash_table_remove_all(tb_io_insns);
++    }
++}
++
+ void translator_loop(CPUState *cpu, TranslationBlock *tb, int *max_insns,
+                      vaddr pc, void *host_pc, const TranslatorOps *ops,
+                      DisasContextBase *db, TCGType addr_type)
+@@ -157,6 +203,8 @@ void translator_loop(CPUState *cpu, TranslationBlock *tb, int *max_insns,
+     db->plugin_enabled = plugin_enabled;
+ 
+     while (true) {
++        vaddr insn_pc = db->pc_next;
++
+         *max_insns = ++db->num_insns;
+         ops->insn_start(db, cpu);
+         db->insn_start = tcg_last_op();
+@@ -201,6 +249,12 @@ void translator_loop(CPUState *cpu, TranslationBlock *tb, int *max_insns,
+             db->is_jmp = DISAS_TOO_MANY;
+             break;
+         }
++
++        /* icount: a known I/O instruction gets a TB of its own */
++        if ((cflags & CF_USE_ICOUNT) && tb_io_insn_ends_tb(insn_pc, db->pc_next)) {
++            db->is_jmp = DISAS_TOO_MANY;
++            break;
++        }
+     }
+ 
+     /* Emit code to exit the TB, as indicated by db->is_jmp.  */
+diff --git a/include/system/cpu-timers.h b/include/system/cpu-timers.h
+index a1abed0..c0558ea 100644
+--- a/include/system/cpu-timers.h
++++ b/include/system/cpu-timers.h
+@@ -43,4 +43,11 @@ int64_t cpus_get_virtual_clock(void);
+ void cpus_set_virtual_clock(int64_t new_time);
+ int64_t cpus_get_elapsed_ticks(void);
+ 
++/*
++ * icount: give each instruction found doing device I/O in the middle of a TB
++ * a TB of its own from then on, instead of rewinding to it at every execution
++ * (accel/tcg/translator.c). Off by default: set before the guest runs.
++ */
++extern bool icount_io_insn_tbs;
++
+ #endif /* SYSTEM_CPU_TIMERS_H */

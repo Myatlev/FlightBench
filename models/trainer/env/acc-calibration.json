@@ -1,0 +1,13 @@
+{"name": "acc-calibration",
+ "description": "Six-position accelerometer calibration as iNav 9.1 expects it (sensors/acceleration.c getPrimaryAxisIndex: the dominant axis of the aligned accelerometer, board frame X forward, Y left, Z up, within 33 deg). The model is held still in each pose; `index` is iNav's position index (0 Z+ level, 1 Z- inverted, 2 X+ nose up, 3 X- nose down, 4 Y+ right side down, 5 Y- left side down). On each `pose` event a client starts the firmware's step (MSP_ACC_CALIBRATION, the configurator's button); iNav samples 500 ms (CALIBRATING_ACC_TIME_MS) within 5 % variance, so each pose is held 3 s after it is reached. Level must come first: it resets iNav's collected positions. Each pose is 3 deg off the axes, as a hand holds it: iNav 9.1 solves the scale with a 4x4 Gauss elimination without pivoting whose first pivot is the X component of the Z-axis samples (common/maths.c sensorCalibrationSolveForScale, rows by position / 2), so exactly axis-aligned poses give NaN gains (its sensorCalibrationValidateResult tests isnan && isinf, never true), accgain 0 and the SETTINGFAIL arming blocker; 1-8 deg off gives 4096 +- 0.01 % (iNav's solver replayed in float32).",
+ "steps": [
+  {"at_s": 0, "action": "pad"},
+  {"at_s": 1, "action": "hold", "euler_deg": [3, 3, null], "rotate_s": 1, "event": "pose", "label": "level", "index": 0},
+  {"at_s": 5, "action": "hold", "euler_deg": [177, -3, null], "rotate_s": 1, "event": "pose", "label": "inverted", "index": 1},
+  {"at_s": 9, "action": "hold", "euler_deg": [-87, 3, null], "rotate_s": 1, "event": "pose", "label": "left side down", "index": 5},
+  {"at_s": 13, "action": "hold", "euler_deg": [87, -3, null], "rotate_s": 1, "event": "pose", "label": "right side down", "index": 4},
+  {"at_s": 17, "action": "hold", "euler_deg": [3, 87, null], "rotate_s": 1, "event": "pose", "label": "nose up", "index": 2},
+  {"at_s": 21, "action": "hold", "euler_deg": [-3, -87, null], "rotate_s": 1, "event": "pose", "label": "nose down", "index": 3},
+  {"at_s": 25, "action": "hold", "euler_deg": [0, 0, null], "rotate_s": 1, "event": "pose", "label": "back to level"},
+  {"at_s": 27, "action": "release", "event": "done"}
+ ]}

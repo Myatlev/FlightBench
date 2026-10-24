@@ -1,0 +1,31 @@
+diff --git a/system/main.c b/system/main.c
+index b8f7157..11266e3 100644
+--- a/system/main.c
++++ b/system/main.c
+@@ -68,6 +68,26 @@ int (*qemu_main)(void) = os_darwin_cfrunloop_main;
+ 
+ int main(int argc, char **argv)
+ {
++#ifdef _WIN32
++    /*
++     * FlightBench: argv from the mingw CRT is the ANSI code page's reencoding of the command
++     * line (GetCommandLineA(), lossy outside that code page), but the -M property values that
++     * carry host paths (session=, root=, fw=, defaults=, manifest=, imu-log=, osd-log=,
++     * fdm-log=, cfg-cache=, bench-state=; hw/arm/nexus_xr.c, devices/src/session.c) are treated
++     * as UTF-8 end to end, including a Cyrillic Windows user name (a bench under %APPDATA%).
++     * QEMU 11.1 does not itself re-derive argv from the wide command line (checked: no
++     * GetCommandLineW/CommandLineToArgvW/g_win32_get_command_line call on the startup path), so
++     * do it here, once, before anything parses argv: g_win32_get_command_line() reads the
++     * process's real UTF-16 command line and hands back UTF-8 strings split the same way
++     * CommandLineToArgvW would. A NULL result (should not happen) leaves the ANSI argv as a
++     * fallback rather than crash. Linux is untouched.
++     */
++    gchar **win_argv = g_win32_get_command_line();
++    if (win_argv) {
++        argc = (int)g_strv_length(win_argv);
++        argv = (char **)win_argv;
++    }
++#endif
+     qemu_init(argc, argv);
+ 
+     /*

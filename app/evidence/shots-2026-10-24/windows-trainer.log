@@ -1,0 +1,111 @@
+Godot Engine v4.7.2.stable.mono.official.ed1daf0bf - https://godotengine.org
+Vulkan 1.4.351 - Forward+ - Using Device #0: NVIDIA - NVIDIA GeForce RTX 3070
+
+[app] repo root <install>\data
+[dev] UI scale 1.0 (setting 'auto', screen dpi 96)
+[app] core <install>\data\core\qemu-system-arm.exe (bundled data/core); data root <install>\data
+[app] aircraft visual: <install>/data/models/trainer/visual/trainer.tscn
+[app] preset 'Trainer · NAV LAUNCH': a bench of that name exists (<install>/benches/Trainer_NAV_LAUNCH.json): opened it as it is, the preset was not copied again
+FlightBench flight screen: bench 'Trainer · NAV LAUNCH' (speedybee-f405-wing/trainer); manifest cache user://manifest.json (flightbench-qemu 0.1): 15 devices (11 modelled, 18 ports), 21 faults, 2 boards (39 pads), 2 aircraft; FB_*: FB_BENCH_DIR=<install>\benches FB_CORE_PORTS=31296 FB_LIVE_CHECK=1 FB_PRESET=inav-trainer-launch FB_SCREENSHOT=<install>\shots\windows-trainer.png FB_SCREENSHOT_CONFIG=<install>\shots\plane-config-progress.png
+[app] core <install>\data\core\qemu-system-arm.exe (bundled data/core), data root <install>\data; FB_CORE_PORTS: this run's ports control 31296, msp 31297, monitor 31298, motion 31299, pilot 31300 (the bench keeps its own)
+[app] core: <install>/benches/sessions/Trainer_NAV_LAUNCH.session.json (root <install>\data), ports control 31296, msp 31297, monitor 31298, motion 31299, pilot 31300
+[app] bench check: machine speedybee-f405-wing, icount shift=2, realtime on, control 31250, msp 31235, 1 session note(s)
+[app] bench state: <install>/benches/state/Trainer_NAV_LAUNCH.state.bin (the firmware config of this bench, kept across restarts; Bench → Reset firmware config to first start… discards it)
+[app] core started: pid 40420, control 31296, msp 31297, monitor 31298, motion 31299, pilot 31300
+[app] connecting to 127.0.0.1:31296
+[app] connected
+[app] manifest: live core (flightbench-qemu 0.1): 15 devices (11 modelled, 18 ports), 21 faults, 2 boards (39 pads), 2 aircraft
+[app] core published 105 signals
+[dev] screenshot saved to <install>\shots\windows-trainer.png
+[event] pose {"label":"launch attitude","step":1,"scenario":"launch"} (t = 1.00 s)
+[event] beep {"on":false} (t = 2.80 s)
+[event] beep ×11 more (t = 2.83..3.08 s, collapsed)
+[event] beep {"on":false} (t = 3.10 s)
+[event] beep ×7 more (t = 3.13..3.28 s, collapsed)
+[event] beep {"on":false} (t = 4.08 s)
+[app] configurator address for the iNav Configurator: 127.0.0.1:31297 (the firmware answered)
+[config:] applying the board's CLI script (134 lines), then save (t = 4.27 s)
+[event] beep ×3 more (t = 4.18..4.28 s, collapsed)
+[event] cli {"open":true,"by":"core","via":"control"} (t = 4.38 s)
+[event] beep {"on":false} (t = 5.38 s)
+[event] beep ×3 more (t = 5.42..5.64 s, collapsed)
+[event] beep {"on":false} (t = 6.66 s)
+[event] beep ×5 more (t = 6.71..7.20 s, collapsed)
+[event] beep {"on":false} (t = 7.94 s)
+[event] beep ×7 more (t = 7.99..8.73 s, collapsed)
+[event] beep {"on":false} (t = 9.22 s)
+[event] beep ×3 more (t = 9.24..9.45 s, collapsed)
+[config:] script saved; ACC calibration: 6 poses, each held still while the firmware samples it (t = 10.77 s)
+[function] calibrate_acc: running… 0/6: Calibrate accelerometer (6 positions) (first start) (t = 10.77 s)
+[event] cli {"open":false,"by":"core","via":"control"} (t = 10.77 s)
+[event] reboot {"cause":"reset"} (t = 10.77 s)
+[event] beep {"on":false} (t = 12.96 s)
+[event] beep ×10 more (t = 12.99..13.21 s, collapsed)
+[event] beep {"on":true} (t = 13.24 s)
+[event] beep ×8 more (t = 13.26..13.44 s, collapsed)
+[event] beep {"on":false} (t = 14.24 s)
+[event] beep ×1 more (t = 14.34..14.34 s, collapsed)
+[event] beep {"on":false} (t = 14.44 s)
+[app] firmware answered 14,4 s after the reboot (the configurator can connect again)
+[event] beep ×1 more (t = 14.44..14.44 s, collapsed)
+[config:] ACC calibration pose 1/6: level (iNav position 0) (t = 16.46 s)
+[function] calibrate_acc: step 1/6: level (iNav position 0) collected (t = 16.96 s)
+[event] beep {"on":false} (t = 16.97 s)
+[event] beep ×5 more (t = 16.99..17.41 s, collapsed)
+[config:] ACC calibration pose 2/6: inverted (iNav position 1) (t = 20.46 s)
+[function] calibrate_acc: step 2/6: inverted (iNav position 1) collected (t = 20.97 s)
+[event] beep {"on":false} (t = 20.98 s)
+[event] beep ×5 more (t = 21.00..21.42 s, collapsed)
+[config:] ACC calibration pose 3/6: left side down (iNav position 5) (t = 24.46 s)
+[dev] FB_SCREENSHOT_CONFIG: config: calibrating the accelerometer… pose 3/6 (left side down) at t = 24,73 s, saved to <install>\shots\plane-config-progress.png
+[event] beep {"on":false} (t = 24.98 s)
+[function] calibrate_acc: step 3/6: left side down (iNav position 5) collected (t = 24.99 s)
+[event] beep ×5 more (t = 25.00..25.42 s, collapsed)
+[config:] ACC calibration pose 4/6: right side down (iNav position 4) (t = 28.46 s)
+[event] beep {"on":false} (t = 28.97 s)
+[function] calibrate_acc: step 4/6: right side down (iNav position 4) collected (t = 28.99 s)
+[event] beep ×5 more (t = 28.99..29.42 s, collapsed)
+[config:] ACC calibration pose 5/6: nose up (iNav position 2) (t = 32.46 s)
+[function] calibrate_acc: step 5/6: nose up (iNav position 2) collected (t = 32.96 s)
+[event] beep {"on":false} (t = 32.97 s)
+[event] beep ×5 more (t = 32.99..33.41 s, collapsed)
+[config:] ACC calibration pose 6/6: nose down (iNav position 3) (t = 36.46 s)
+[event] beep {"on":false} (t = 36.97 s)
+[function] calibrate_acc: step 6/6: nose down (iNav position 3) collected (t = 36.97 s)
+[event] beep ×15 more (t = 36.99..37.82 s, collapsed)
+[event] pose {"label":"back to level","step":7,"scenario":"acc-calibration"} (t = 40.46 s)
+[event] done {"label":"","step":8,"scenario":"acc-calibration"} (t = 41.46 s)
+[event] scenario 'acc-calibration' ended (t = 41.46 s)
+[function] calibrate_acc: done: all 6 positions; acczero 41 41 41, accgain 4076 4076 4075; the first start saves it (t = 41.46 s)
+[function] calibrate_mag: running… 0/3: Calibrate compass (turn the model through the field) (first start) (t = 41.46 s)
+[function] calibrate_mag: step 1/3: MSP_MAG_CALIBRATION: the firmware samples; turning the model through the field (t = 41.46 s)
+[event] beep {"on":false} (t = 41.55 s)
+[event] beep ×5 more (t = 41.60..41.75 s, collapsed)
+[event] scenario 'mag-calibration' ended (t = 60.06 s)
+[function] calibrate_mag: step 2/3: sweep done: waiting for the firmware's result (mag_calibration_time) (t = 60.06 s)
+[event] beep {"on":false} (t = 71.56 s)
+[function] calibrate_mag: done: magzero -1 0 0, maggain 1496 1503 1497; the first start saves it (t = 71.74 s)
+[event] cli {"open":true,"by":"core","via":"control"} (t = 71.85 s)
+[event] beep ×3 more (t = 71.58..71.86 s, collapsed)
+[event] pose {"label":"launch attitude","step":1,"scenario":"launch"} (t = 72.75 s)
+[config:] applied with calibrate_acc, calibrate_mag, ACC calibrated: the config sector is saved and kept as the snapshot (later starts restore it) (t = 72.95 s)
+[event] cli {"open":false,"by":"core","via":"control"} (t = 72.95 s)
+[event] reboot {"cause":"reset"} (t = 72.95 s)
+[event] beep {"on":false} (t = 75.14 s)
+[event] beep ×9 more (t = 75.16..75.36 s, collapsed)
+[event] beep {"on":false} (t = 75.39 s)
+[event] beep ×9 more (t = 75.41..75.61 s, collapsed)
+[event] beep {"on":false} (t = 76.41 s)
+[event] beep ×1 more (t = 76.51..76.51 s, collapsed)
+[event] beep {"on":false} (t = 76.61 s)
+[app] firmware answered 16,9 s after the reboot (the configurator can connect again)
+[event] beep ×1 more (t = 76.61..76.61 s, collapsed)
+[live-check] screenshot <install>\shots\windows-trainer.png
+[event] beep {"on":false} (t = 77.68 s)
+[event] beep ×6 more (t = 77.72..77.99 s, collapsed)
+[event] beep {"on":true} (t = 78.14 s)
+[live-check] PASS: Transmitter 'modes: from firmware (t = 76.67 s)' switches [ch5 ARM (AUX1): — | ARM; ch6 ANGLE (AUX2): — | ANGLE; ch7 NAV LAUNCH (AUX3): — | NAV LAUNCH] (variant INAV); Functions [calibrate_acc, calibrate_mag, calibrate_gyro, launch] from live core; Config 'diff all from the firmware (first start, t = 71.88 s, 2026-10-24 13:55), 206 lines'; Status 'connected · realtime 0.93× · 74 states/s' / 'disarmed · [MANUAL] · flags: CAL THR · cpu 25%' / 'OSD: MAX7456 30×16 (no video in FlightBench) · baro 0.00 m'; Aircraft rows alt,speed,air,power,surfaces,launch,step; configurator 127.0.0.1:31297; core Core: running · pid 40420 · control 31296, msp 31297
+[live-check] screenshot <install>\shots\windows-trainer-views.png
+[event] beep ×8 more (t = 78.19..78.50 s, collapsed)
+FlightBench flight exiting: 8026 states, last t = 80,40 s, signals 105 traces / 8026 samples, csv rows 0, commands dropped 0
+[app] closing the bench: stopping core pid 40420

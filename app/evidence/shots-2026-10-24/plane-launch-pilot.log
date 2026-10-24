@@ -1,0 +1,21 @@
+# plan plane-launch queued: [(0.0, {1: 1500, 2: 1500, 3: 1000, 4: 1500, 5: 1000, 6: 1000, 7: 1000, 8: 1500}), (55.0, {6: 2000, 7: 2000}), (56.0, {5: 2000}), (58.0, {3: 1700}), (59.0, {'launch': {'speed_kmh': 50, 'duration_s': 0.5, 'pitch_deg': 10, 'heading_deg': None}}), (69.0, {7: 1000, 3: 1550})]
+t=5.52
+t=15.52
+t=25.53
+t=35.53
+t=45.54
+t=55.54
+Traceback (most recent call last):
+  File "D:\dev\Git\flightbench\core\qemu\scripts\flight.py", line 245, in <module>
+    main()
+    ~~~~^^
+  File "D:\dev\Git\flightbench\core\qemu\scripts\flight.py", line 196, in main
+    tv = float(pilot.send({}).split("t=")[1])
+               ~~~~~~~~~~^^^^
+  File "D:\dev\Git\flightbench\core\qemu\scripts\flight.py", line 125, in send
+    self.f.write((json.dumps(obj) + "\n").encode()); self.f.flush()
+                                                     ~~~~~~~~~~~~^^
+  File "C:\Python314\Lib\socket.py", line 743, in write
+    return self._sock.send(b)
+           ~~~~~~~~~~~~~~~^^^
+ConnectionResetError: [WinError 10054] ��������� ���� ������������� �������� ������������ �����������

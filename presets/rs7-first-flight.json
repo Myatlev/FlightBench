@@ -1,0 +1,199 @@
+{
+  "name": "RS7 · First flight",
+  "description": "Nexus-XR with the bundled RotorFlight 4.6.0 on a Goosky RS7 700, full wiring: arm and fly.",
+  "board": "nexus-xr",
+  "firmwarePath": "firmware/nexus-xr/rotorflight_4.6.0_STM32F7X2.hex",
+  "watchFirmware": false,
+  "aircraft": "rs7",
+  "transmitter": {
+    "5": {
+      "type": "auto"
+    },
+    "6": {
+      "type": "switch2",
+      "label": "throttle"
+    }
+  },
+  "wiring": [
+    {
+      "device": "servo",
+      "port": "pwm",
+      "pad": "servo1",
+      "links": {},
+      "actuator": "swash_a",
+      "reversed": false,
+      "option": "",
+      "props": {}
+    },
+    {
+      "device": "servo",
+      "port": "pwm",
+      "pad": "servo2",
+      "links": {},
+      "actuator": "swash_b",
+      "reversed": false,
+      "option": "",
+      "props": {}
+    },
+    {
+      "device": "servo",
+      "port": "pwm",
+      "pad": "servo3",
+      "links": {},
+      "actuator": "swash_c",
+      "reversed": false,
+      "option": "",
+      "props": {}
+    },
+    {
+      "device": "servo",
+      "port": "pwm",
+      "pad": "servo4",
+      "links": {},
+      "actuator": "tail",
+      "reversed": false,
+      "option": "",
+      "props": {}
+    },
+    {
+      "device": "esc",
+      "port": "signal",
+      "pad": "motor1",
+      "links": {},
+      "actuator": "motor",
+      "reversed": false,
+      "option": "bidir",
+      "props": {}
+    },
+    {
+      "device": "icm42688p",
+      "port": "spi",
+      "pad": "gyro1",
+      "links": {},
+      "actuator": "",
+      "reversed": false,
+      "option": "",
+      "props": {}
+    },
+    {
+      "device": "dps310",
+      "port": "i2c",
+      "pad": "i2c3",
+      "links": {},
+      "actuator": "",
+      "reversed": false,
+      "option": "",
+      "props": {}
+    },
+    {
+      "device": "crsf",
+      "port": "uart",
+      "pad": "uart5",
+      "links": {},
+      "actuator": "",
+      "reversed": false,
+      "option": "",
+      "props": {}
+    },
+    {
+      "device": "spiflash",
+      "port": "spi",
+      "pad": "flash1",
+      "links": {},
+      "actuator": "",
+      "reversed": false,
+      "option": "",
+      "props": {}
+    }
+  ],
+  "detached": [],
+  "wiringLayout": {},
+  "boardConfig": "",
+  "boardConfigFile": "boards/nexus-xr/NEXUS_XR.config",
+  "profileFile": "models/rs7/qemu-profile.txt",
+  "time": {
+    "icountShift": 2,
+    "idleSkip": true,
+    "realtime": true
+  },
+  "core": "local",
+  "coreHost": "127.0.0.1",
+  "corePort": 31250,
+  "mspPort": 31235,
+  "layout": {
+    "Status": {
+      "open": true,
+      "x": 20,
+      "y": 70,
+      "w": 380,
+      "h": 150
+    },
+    "Aircraft": {
+      "open": true,
+      "x": 20,
+      "y": 270,
+      "w": 380,
+      "h": 300
+    },
+    "Transmitter": {
+      "open": true,
+      "x": 1220,
+      "y": 390,
+      "w": 360,
+      "h": 470
+    },
+    "Log / CLI": {
+      "open": true,
+      "x": 420,
+      "y": 70,
+      "w": 700,
+      "h": 280
+    },
+    "Firmware": {
+      "open": false,
+      "x": 400,
+      "y": 370,
+      "w": 600,
+      "h": 160
+    },
+    "Signals": {
+      "open": false,
+      "x": 400,
+      "y": 370,
+      "w": 900,
+      "h": 420
+    },
+    "Wiring": {
+      "open": false,
+      "x": 860,
+      "y": 330,
+      "w": 700,
+      "h": 540
+    },
+    "Model": {
+      "open": false,
+      "x": 1240,
+      "y": 50,
+      "w": 340,
+      "h": 300
+    },
+    "Faults": {
+      "open": false,
+      "x": 1180,
+      "y": 360,
+      "w": 420,
+      "h": 460
+    },
+    "OSD": {
+      "open": false,
+      "x": 420,
+      "y": 380,
+      "w": 560,
+      "h": 320
+    }
+  },
+  "signals": [],
+  "camera": "orbit",
+  "bodyAxes": false,
+  "osdOverlay": true
+}

@@ -1,0 +1,4 @@
+{"board":"speedybee-f405-wing","firmware":"~/flightbench-spike/inav-fw/inav_9.1.0_SPEEDYBEEF405WING.hex",
+ "aircraft":"rs7",
+ "time":{"icount_shift":2,"realtime":false,"idle_skip":false},
+ "ports":{"control":31250,"msp":31235}}
