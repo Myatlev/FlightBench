@@ -135,7 +135,8 @@ Three steps on a clean Windows machine, nothing in the tree points at a particul
    the core in `Contents/Helpers`), `LICENSE` + `README.txt` next to it, and the zip. Signed ad hoc unless
    `--sign "Developer ID Application: …"` (+ `--notarize <notarytool keychain profile>`); details: `app/README.md` → Export.
 3. **Check**: `FB_PRESET=rs7-first-flight FB_LIVE_CHECK=1 dist/FlightBench-macos/FlightBench.app/Contents/MacOS/FlightBench`
-   prints the same two `PASS` lines.
+   prints the same two `PASS` lines. The core and its Homebrew dylibs run on the building Mac's macOS version or newer
+   (Homebrew bottles target the host; a build for older macOS needs them built with `MACOSX_DEPLOYMENT_TARGET`, open item).
 
 **Linux core** (headless, no client): `core/qemu/build.sh`, then `core/qemu/run.sh --session <bench.json>`.
 
