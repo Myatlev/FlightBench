@@ -11,8 +11,9 @@ bundled core and firmware), `README.txt` and `LICENSE`. Run `FlightBench.exe` �
 
 macOS (Apple silicon): `FlightBench-macos-v<version>.zip` holds `FlightBench.app`, `README.txt` and `LICENSE`; open the
 app (the core and the data travel inside the bundle). Everything below is the same; where it says `FlightBench.exe`,
-read `FlightBench.app`. A build that is not signed with a Developer ID is refused by Gatekeeper on another Mac — right-click
-→ Open, or `xattr -dr com.apple.quarantine FlightBench.app`; the published builds will be signed and notarized.
+read `FlightBench.app`. The published builds are signed with a Developer ID and notarized, so Gatekeeper opens them like any
+downloaded app; a build you made yourself without `--sign` is refused on another Mac (right-click → Open, or
+`xattr -dr com.apple.quarantine FlightBench.app`).
 
 ![Main menu on first run](img/main-menu-first-run.png)
 *Caption: the main menu's first-run state — the Presets list on top with the "Start with a preset" hint.*

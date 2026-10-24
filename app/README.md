@@ -255,7 +255,9 @@ runtime (a hardened ad-hoc core cannot load its own dylibs: library validation w
 building Mac only. `--sign "Developer ID Application: Name (TEAM)"` signs with the hardened runtime and a timestamp;
 `--notarize <profile>` (a `xcrun notarytool store-credentials` keychain profile) submits, waits, staples and asks
 Gatekeeper (`spctl --assess`). Check: `FB_PRESET=rs7-first-flight FB_LIVE_CHECK=1 dist/FlightBench-macos/FlightBench.app/Contents/MacOS/FlightBench`.
-Result (2026-10-24, M-series Mac): arm64 app + core 195 MB, zip 64 MB (universal: 355 MB / 129 MB); live-check 2 PASS. Self-tests run the same way (`FB_SELFTEST=all FB_CORE=127.0.0.1:31250 <Godot_mono.app>/Contents/MacOS/Godot --path app --headless`
+Result (2026-10-24, M-series Mac): arm64 app + core 195 MB, zip 65 MB (universal: 355 MB / 129 MB); live-check 2 PASS on the
+signed, hardened bundle; notarytool "Accepted" in about two minutes, `spctl --assess` on a quarantined copy of the zip:
+"source=Notarized Developer ID". Self-tests run the same way (`FB_SELFTEST=all FB_CORE=127.0.0.1:31250 <Godot_mono.app>/Contents/MacOS/Godot --path app --headless`
 with `python3 tools/fake_core.py`): 46/46.
 
 Result (2026-09-26): `FlightBench.exe` (~105 MB, engine + PCK) + `data_FlightBench_windows_x86_64/` (the .NET
